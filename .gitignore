@@ -20,6 +20,7 @@ logs/
 .env.*.local
 backend/.env
 frontend/.env
+backend/refresh_token.json
 
 # Miscellaneous
 .DS_Store
