@@ -1,0 +1,21 @@
+.bg-dashboard {
+    background-color: #131c21; /* Same color as the dashboard page */
+  }
+  
+  .bg-gray-900 {
+    background-color: #131c21; /* Default page background color */
+  }
+  .home-button {
+    background-color: transparent;
+    color: #4caf50;
+    border: 2px solid #4caf50;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .home-button:hover {
+    background-color: #388e3c; /* Darker green */
+    color: white; /* Text turns white */
+  }

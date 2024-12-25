@@ -1,0 +1,81 @@
+.projects-section {
+  padding: 50px 20px;
+  background-color: #131c21;
+  color: white;
+  text-align: center;
+  margin-left: 300px; /* Matches the width of the navigation bar */
+  max-width: calc(100% - 300px); /* Ensures it doesn't exceed the available space */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.projects-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #4caf50;
+}
+
+.projects-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%; /* Ensures grid spans the entire section */
+  max-width: 1200px; /* Limits the grid width for better readability */
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #1a1f25;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.project-image {
+  max-width: 100%; /* Allow image to scale with the card */
+  max-height: 200px; /* Limit height for consistency */
+  width: 100%; /* Responsive scaling */
+  height: auto; /* Maintain aspect ratio */
+  object-fit: cover; /* Fit image nicely within its container */
+}
+
+.project-content {
+  padding: 20px;
+  text-align: left;
+}
+
+.project-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.project-content p {
+  font-size: 1rem;
+  color: #a9a9a9;
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.project-tag {
+  background-color: #4caf50;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .projects-section {
+    margin-left: 0;
+    max-width: 100%; /* Full width for mobile */
+    padding: 30px 15px;
+  }
+}

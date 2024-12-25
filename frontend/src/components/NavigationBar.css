@@ -1,0 +1,76 @@
+/* Base styles for navigation bar */
+.navigation-bar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 300px; /* Fixed width for desktop */
+  height: 100vh; /* Full height to cover the viewport */
+  background-color: #131c21; /* Matches the website background */
+  color: #4caf50; /* Consistent green color for the text */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align content at the top */
+  align-items: center; /* Center content horizontally */
+  padding: 20px 0; /* Adds some padding at the top and bottom */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow effect */
+  z-index: 1000; /* Ensures the navbar stays on top */
+  transition: width 0.3s ease; /* Smooth transition for width */
+}
+
+/* Name button styling */
+.name-button {
+  background-color: #4caf50;
+  color: #131c21;
+  padding: 10px 20px;
+  border-radius: 50px; /* Rounded button effect */
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.name-button:hover {
+  background-color: #3a9c3f;
+  transform: scale(1.05); /* Slight scale effect on hover */
+}
+
+/* Navigation links styling */
+.navigation-bar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%; /* Makes the list full width */
+  text-align: center;
+}
+
+.navigation-bar li {
+  margin: 10px 0; /* Space between each navigation item */
+}
+
+.navigation-bar a {
+  text-decoration: none;
+  color: #4caf50; /* Green color */
+  font-size: 1.2rem; /* Larger font size */
+  transition: color 0.3s; /* Smooth color transition on hover */
+}
+
+.navigation-bar a:hover {
+  color: #3a9c3f; /* Darker green on hover */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .navigation-bar {
+    width: 200px; /* Adjust width for smaller screens */
+  }
+
+  .name-button {
+    font-size: 1.2rem;
+    padding: 8px 15px;
+  }
+
+  .navigation-bar a {
+    font-size: 1rem; /* Adjust font size for links */
+  }
+}

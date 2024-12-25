@@ -1,0 +1,76 @@
+.experience-section {
+  padding: 50px 20px; /* Add padding for mobile views */
+  background-color: #131c21;
+  color: white;
+  text-align: center;
+  margin-left: 300px; /* Matches the navigation bar width */
+  max-width: calc(100% - 300px); /* Center-align considering the nav bar */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.experience-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #4caf50;
+}
+
+.experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 900px;
+  width: 100%; /* Ensure it adapts to different screen sizes */
+  margin: 0 auto; /* Centers the list within the section */
+}
+
+.experience-card {
+  background-color: #1a1f25;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: left;
+}
+
+.experience-date {
+  font-size: 0.9rem;
+  color: #4caf50;
+  margin-bottom: 10px;
+}
+
+.experience-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.experience-description {
+  font-size: 1rem;
+  color: #a9a9a9;
+  white-space: pre-line; /* Ensures line breaks in descriptions */
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.experience-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.experience-tag {
+  background-color: #4caf50;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .experience-section {
+    margin-left: 0; /* Remove margin-left for small screens */
+    max-width: 100%; /* Use full width */
+    padding: 30px 15px; /* Adjust padding */
+  }
+}

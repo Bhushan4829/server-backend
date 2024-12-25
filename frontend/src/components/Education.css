@@ -1,0 +1,81 @@
+.education-section {
+  padding: 50px 20px;
+  background-color: #131c21; /* Dark background */
+  color: white;
+  text-align: center;
+  margin-left: 300px; /* Adjusts for the navigation bar width */
+  max-width: calc(100% - 300px); /* Centers the section within the remaining space */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.education-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #4caf50; /* Green accent for the header */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.education-section h2::before {
+  content: "🎓"; /* Adding an icon before the title */
+  margin-right: 10px;
+}
+
+.education-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto; /* Centers content within the section */
+}
+
+.education-card {
+  background-color: #1a1f25; /* Card background matches the section */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.education-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.education-date {
+  font-size: 0.9rem;
+  color: #4caf50; /* Green for emphasis */
+  margin-bottom: 10px;
+}
+
+.education-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: white; /* Title remains white */
+}
+
+.education-institution {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #f2c94c; /* Accent color for institution names */
+}
+
+.education-description {
+  font-size: 1rem;
+  color: #a9a9a9; /* Light gray for readability */
+  white-space: pre-line; /* Ensures line breaks in descriptions */
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .education-section {
+    margin-left: 0; /* Reset margin on small screens */
+    max-width: 100%; /* Use full width */
+    padding: 30px 15px;
+  }
+}

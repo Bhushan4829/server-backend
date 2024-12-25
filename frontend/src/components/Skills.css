@@ -1,0 +1,55 @@
+.skills-section {
+  padding: 50px 20px;
+  text-align: center;
+  background-color: #131c21; /* Matches the About Me section */
+  color: white; /* Text color to match About Me */
+  margin-left: 300px; /* Aligns the section with the navigation bar */
+  max-width: calc(100% - 300px); /* Ensures the section does not exceed the available space */
+}
+
+.skills-section h2 {
+  font-size: 2.5rem;
+  color: #4caf50; /* Match heading color in About Me */
+}
+
+.skills-section p {
+  font-size: 1.2rem;
+  color: #ddd; /* Adjust text color for readability */
+  margin-bottom: 30px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Flexible grid */
+  gap: 20px;
+  justify-items: center;
+}
+
+.skill-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #1a1f25; /* Slightly darker background for contrast */
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+.skill-icon {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+.skill-card p {
+  font-size: 1rem;
+  color: white; /* Ensure text is readable against dark background */
+}
+
+@media (max-width: 768px) {
+  .skills-section {
+    margin-left: 0; /* Remove left margin for small screens */
+    max-width: 100%; /* Use full width for smaller devices */
+    padding: 30px 15px; /* Adjust padding */
+  }
+}
