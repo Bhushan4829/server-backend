@@ -1,9 +1,10 @@
 const axios = require('axios');
 
 const fetchLeetCodeData = async () => {
+  const username = process.env.LEETCODE_USERNAME;
   const query = `
   {
-    matchedUser(username: "MS_Bhushan") {
+    matchedUser(username: "${username}") {
       submitStats {
         acSubmissionNum {
           difficulty

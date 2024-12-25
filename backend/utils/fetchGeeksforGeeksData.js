@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 
-const fetchGeeksforGeeksData = async (username) => {
+const fetchGeeksforGeeksData = async () => {
+  const username = process.env.GFG_USERNAME;
   const url = `https://auth.geeksforgeeks.org/user/${username}/practice/`;
 
   try {

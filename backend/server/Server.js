@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cron = require('node-cron');
-
+const fs = require('fs');
 // Import stat fetchers
 const fetchLeetCodeData = require('../utils/fetchLeetCodeData');
 const fetchGeeksforGeeksData = require('../utils/fetchGeeksforGeeksData');
@@ -31,14 +31,21 @@ mongoose
     try {
       const response = await oauth2Client.getToken(code);
       const tokens = response.tokens;
-      oauth2Client.setCredentials(tokens);
-      if (tokens.refresh_token) {
-        // Save the refresh token securely (e.g., database, .env, or file)
-        console.log('Refresh Token:', tokens.refresh_token);
   
-        // For simplicity, write it to a file (replace this with database storage in production)
-        const fs = require('fs');
-        fs.writeFileSync('./refresh_token.json', JSON.stringify({ refresh_token: tokens.refresh_token }));
+      console.log('Token Response:', tokens);
+  
+      oauth2Client.setCredentials(tokens);
+  
+      if (tokens.refresh_token) {
+        console.log('Saving new refresh token');
+        try {
+          fs.writeFileSync('./refresh_token.json', JSON.stringify({ refresh_token: tokens.refresh_token }));
+          console.log('Refresh token saved successfully');
+        } catch (err) {
+          console.error('Error saving refresh token:', err);
+        }
+      } else {
+        console.log('No refresh token provided in the response');
       }
   
       res.send('Authentication successful! You can close this tab.');
@@ -47,6 +54,7 @@ mongoose
       res.status(500).send('Authentication failed.');
     }
   });
+  
 
 const streakSchema = new mongoose.Schema({
   date: { type: Date, unique: true, required: true },
@@ -161,7 +169,7 @@ app.get('/api/dashboard-data', async (req, res) => {
 
     // Fetch data from external sources
     const codingStatsLeetCode = await fetchLeetCodeData();
-    const codingStatsGeeksforGeeks = await fetchGeeksforGeeksData('bhushanmahdduu');
+    const codingStatsGeeksforGeeks = await fetchGeeksforGeeksData();
     const githubStats = await fetchGitHubData();
     const taskStats = await fetchGoogleTasks();
 

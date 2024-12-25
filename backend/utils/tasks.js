@@ -1,12 +1,12 @@
 require('dotenv').config();
 const { google } = require('googleapis');
 const { DateTime } = require('luxon'); // Ensure luxon is installed
-
+const fs = require('fs');
 // Initialize Google OAuth2 Client
 const oauth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
-  'http://localhost:5000/auth/google/callback'
+  process.env.REDIRECT_URI
 );
 
 console.log('OAuth2 Client Initialized');
