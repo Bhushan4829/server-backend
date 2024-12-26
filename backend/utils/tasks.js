@@ -10,16 +10,20 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 console.log('OAuth2 Client Initialized');
-try {
-  const tokenData = fs.readFileSync('./refresh_token.json', 'utf8');
-  const { refresh_token } = JSON.parse(tokenData);
-
-  if (refresh_token) {
-    oauth2Client.setCredentials({ refresh_token });
-    console.log('Refresh Token Loaded');
+const refreshToken = process.env.REFRESH_TOKEN || (() => {
+  try {
+    const tokenData = fs.readFileSync('./refresh_token.json', 'utf8');
+    return JSON.parse(tokenData).refresh_token;
+  } catch (error) {
+    console.error('Error loading refresh token:', error);
+    return null;
   }
-} catch (error) {
-  console.error('Error loading refresh token:', error);
+})();
+if (refreshToken) {
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+  console.log('Refresh Token Loaded');
+} else {
+  console.error('No refresh token available.');
 }
 // Function to fetch tasks from Google Tasks API
 const fetchGoogleTasks = async () => {
