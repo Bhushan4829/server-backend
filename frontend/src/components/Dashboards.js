@@ -80,6 +80,7 @@ function Dashboard() {
       },
     ],
   };
+  console.log(data.codingStatsGeeksforGeeks);
 
   // Pie Chart: Coding Stats (Daily Solved)
   const dailyCodingData = {
