@@ -106,18 +106,18 @@ function Dashboard() {
   const totalCodingData = {
     labels: ['LeetCode', 'GeeksforGeeks'],
     datasets: [
-      {
-        label: 'Total Problems Solved',
-        data: [
-          (data.codingStatsLeetCode?.easy || 0) +
-            (data.codingStatsLeetCode?.medium || 0) +
-            (data.codingStatsLeetCode?.hard || 0),
-          data.codingStatsGeeksforGeeks?.totalProblemsSolved || 0,
-        ],
-        backgroundColor: ['#4caf50', '#ff9800'],
-      },
+        {
+            label: 'Total Problems Solved',
+            data: [
+                (data.codingStatsLeetCode?.easy || 0) +
+                (data.codingStatsLeetCode?.medium || 0) +
+                (data.codingStatsLeetCode?.hard || 0),
+                data.codingStatsGeeksforGeeks?.totalProblemsSolved || 0, // Ensure this is not undefined
+            ],
+            backgroundColor: ['#4caf50', '#ff9800'],
+        },
     ],
-  };
+};
 
   // Bar Chart: GitHub Stats (Daily Activity)
   const githubDailyData = {

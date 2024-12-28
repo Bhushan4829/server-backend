@@ -189,13 +189,13 @@ app.get('/api/dashboard-data', async (req, res) => {
           )
         : 0;
 
-      const geeksDailySolved = previousStreak
+        const geeksDailySolved = previousStreak
         ? Math.max(
-            codingStatsGeeksforGeeks.totalProblemsSolved -
-              (previousStreak.codingStatsGeeksforGeeks?.totalProblemsSolved || 0),
+            codingStatsGeeksforGeeks.totalProblemsSolved - 
+            (previousStreak.codingStatsGeeksforGeeks?.totalProblemsSolved || 0),
             0
           )
-        : 0;
+        : 0;      
 
       streakData = await Streak.findOneAndUpdate(
         { date: new Date(localToday) },
