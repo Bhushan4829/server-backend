@@ -2,6 +2,7 @@ require('dotenv').config();
 const { google } = require('googleapis');
 const { DateTime } = require('luxon'); // Ensure luxon is installed
 const fs = require('fs');
+
 // Initialize Google OAuth2 Client
 const oauth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
@@ -26,6 +27,7 @@ if (refreshToken) {
 } else {
   console.error('No refresh token available.');
 }
+
 // Function to fetch tasks from Google Tasks API
 const fetchGoogleTasks = async () => {
   const tasksService = google.tasks({ version: 'v1', auth: oauth2Client });

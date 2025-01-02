@@ -17,13 +17,21 @@ const fetchLeetCodeData = async () => {
   try {
     const response = await axios.post('https://leetcode.com/graphql', { query });
     console.log('Response Data:', response.data); // Log response for debugging
+
     const stats = response.data.data.matchedUser.submitStats.acSubmissionNum;
 
+    const easy = stats.find((item) => item.difficulty === 'Easy')?.count || 0;
+    const medium = stats.find((item) => item.difficulty === 'Medium')?.count || 0;
+    const hard = stats.find((item) => item.difficulty === 'Hard')?.count || 0;
+
+    // Correct calculation of totalProblemsSolved
+    const totalProblemsSolved = easy + medium + hard;
+
     return {
-      easy: stats[1].count,
-      medium: stats[2].count,
-      hard: stats[3].count,
-      totalProblemsSolved: stats.reduce((acc, curr) => acc + curr.count, 0),
+      easy,
+      medium,
+      hard,
+      totalProblemsSolved,
     };
   } catch (error) {
     console.error('Error fetching LeetCode data:', error.response?.data || error.message);

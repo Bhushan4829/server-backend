@@ -30,7 +30,7 @@ Thumbs.db
 *.tmp
 
 # IDE and Editor specific
-.vscode/
+
 .idea/
 *.sublime-project
 *.sublime-workspace

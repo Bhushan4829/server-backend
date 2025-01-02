@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Dashboard.css';
+import { DateTime } from 'luxon';
 import { Line, Pie, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -35,11 +36,13 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://backend-nsyi.onrender.com/api/dashboard-data');
+        // const response = await axios.get('https://backend-nsyi.onrender.com/api/dashboard-data');
+        const response = await axios.get('http://localhost:5000/api/dashboard-data');
         setData(response.data);
 
         // Fetch streak history
-        const streakResponse = await axios.get('https://backend-nsyi.onrender.com/api/streak-history');
+        // const streakResponse = await axios.get('https://backend-nsyi.onrender.com/api/streak-history');
+        const streakResponse = await axios.get('http://localhost:5000/api/streak-history');
         setStreakHistory(streakResponse.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -68,6 +71,8 @@ function Dashboard() {
     codingStatsLeetCode.medium || 0,
     codingStatsLeetCode.hard || 0,
   ];
+  // const dueDate = DateTime.fromISO(task.due, { zone: 'utc' }).setZone('America/New_York').toLocaleString(DateTime.DATE_MED);
+
   const streakData = {
     labels: streakLabels.length > 0 ? streakLabels : ['No data'],
     datasets: [
@@ -188,11 +193,15 @@ function Dashboard() {
   <h3>Today's Tasks</h3>
   {todayTasks.length > 0 ? (
     <ul>
-      {todayTasks.map((task, index) => (
-        <li key={index}>
-          <strong>{task.title}</strong> - {task.completed ? '✅' : '❌'} (Due: {new Date(task.due).toLocaleDateString()})
-        </li>
-      ))}
+      {todayTasks.map((task, index) => {
+        // Parse `due` as a plain date (ignore timezones)
+        const dueDate = DateTime.fromISO(task.due, { zone: 'utc' }).toFormat('MM/dd/yyyy');
+        return (
+          <li key={index}>
+            <strong>{task.title}</strong> - {task.completed ? '✅' : '❌'} (Due: {dueDate})
+          </li>
+        );
+      })}
     </ul>
   ) : (
     <p>No tasks for today.</p>
