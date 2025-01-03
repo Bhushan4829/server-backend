@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const cron = require('node-cron');
+const moment = require('moment-timezone');
 const fs = require('fs');
 // Import stat fetchers
 const fetchLeetCodeData = require('../utils/fetchLeetCodeData');
@@ -15,14 +15,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-const mongoURI = process.env.MONGO_URI;
-mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.error('Error connecting to MongoDB:', err));
-
-// OAuth2 routes
 app.get('/auth/google', (req, res) => {
   const scopes = ['https://www.googleapis.com/auth/tasks.readonly'];
   const url = oauth2Client.generateAuthUrl({ access_type: 'offline', scope: scopes });
@@ -57,6 +49,20 @@ app.get('/auth/google/callback', async (req, res) => {
   }
 });
 
+// Connect to MongoDB
+const mongoURI = process.env.MONGO_URI;
+mongoose
+  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('Error connecting to MongoDB:', err));
+
+// Define local day boundaries based on the desired time zone
+const getLocalDayBoundaries = () => {
+  const startOfDay = moment().tz('America/New_York').startOf('day');
+  const endOfDay = moment().tz('America/New_York').endOf('day');
+  return { startOfDay, endOfDay };
+};
+
 // Define Mongoose schema and model
 const streakSchema = new mongoose.Schema({
   date: { type: Date, unique: true, required: true },
@@ -73,7 +79,15 @@ const Streak = mongoose.model('Streak', streakSchema);
 
 // Helper function to calculate streak
 const calculateStreak = ({ codingStats, githubStats, taskStats }) => {
-  const taskPoint = taskStats.completionRate >= 80 ? 1 : 0;
+  const { startOfDay, endOfDay } = getLocalDayBoundaries();
+
+  // Filter tasks completed within the local day
+  const completedTasks = taskStats.todayTasks.filter(task => {
+    const completedTimeLocal = moment(task.completedTimestamp).tz('America/New_York');
+    return completedTimeLocal.isBetween(startOfDay, endOfDay, null, '[)');
+  });
+
+  const taskPoint = completedTasks.length >= 2 ? 1 : 0;
   const codingPoint = (codingStats.leetcodeDailySolved || 0) + (codingStats.geeksDailySolved || 0) >= 2 ? 1 : 0;
   const githubPoint = githubStats.commits > 0 ? 1 : 0;
 
@@ -87,8 +101,12 @@ app.get('/api/dashboard-data', async (req, res) => {
     console.log('[DEBUG] /api/dashboard-data: Request received.');
 
     const today = new Date();
-    const localToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
-    console.log('[DEBUG] Local Today:', localToday);
+    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
+
+    const parts = formatter.formatToParts(today);
+    const localToday = `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}-${parts.find(p => p.type === 'day').value}`;
+
+    console.log('[DEBUG] Local Today (Adjusted to EST):', localToday);
 
     // Fetch data from external sources concurrently
     console.log('[DEBUG] Fetching data from external sources...');
@@ -96,7 +114,7 @@ app.get('/api/dashboard-data', async (req, res) => {
       codingStatsLeetCode,
       codingStatsGeeksforGeeks,
       githubStats,
-      taskStats
+      taskStats,
     ] = await Promise.all([
       fetchLeetCodeData().then((data) => {
         console.log('[DEBUG] LeetCode Data Fetched:', data);
@@ -113,7 +131,7 @@ app.get('/api/dashboard-data', async (req, res) => {
       fetchGoogleTasks().then((data) => {
         console.log('[DEBUG] Google Tasks Data Fetched:', data);
         return data;
-      })
+      }),
     ]);
 
     console.log('[DEBUG] All external data fetched successfully.');
@@ -123,6 +141,7 @@ app.get('/api/dashboard-data', async (req, res) => {
     const previousStreak = await Streak.findOne().sort({ date: -1 });
     console.log('[DEBUG] Previous Streak:', previousStreak);
 
+    // Calculate daily solved problems
     const leetcodeDailySolved = previousStreak
       ? Math.max(
           (codingStatsLeetCode.totalProblemsSolved || 0) -
@@ -139,18 +158,29 @@ app.get('/api/dashboard-data', async (req, res) => {
         )
       : codingStatsGeeksforGeeks.totalProblemsSolved || 0;
 
-    const streakPoints = calculateStreak({
+    console.log('[DEBUG] Data passed to calculateStreak:', {
       codingStats: { leetcodeDailySolved, geeksDailySolved },
       githubStats,
       taskStats,
     });
 
+    const streakPoints = calculateStreak({
+      codingStats: { leetcodeDailySolved, geeksDailySolved },
+      githubStats,
+      taskStats,
+    });
+    console.log('[DEBUG] Streak Points:', streakPoints);
+
     let streak = 0;
     let streakData = await Streak.findOne({ date: new Date(localToday) });
 
     if (streakData) {
-      console.log('[DEBUG] Streak for today already exists. Updating streak data.');
-      streak = streakPoints >= 2 ? streakData.streak + 1 : 0;
+      console.log('[DEBUG] Streak for today already exists. Re-evaluating streak data.');
+
+      streak = streakPoints === 1
+        ? (previousStreak?.streak || 0) + 1
+        : 0;
+
       streakData = await Streak.findOneAndUpdate(
         { date: new Date(localToday) },
         {
@@ -165,8 +195,11 @@ app.get('/api/dashboard-data', async (req, res) => {
         { new: true }
       );
     } else {
-      console.log('[DEBUG] No data found for today and for streak. Creating a new entry...');
-      streak = previousStreak && streakPoints >= 2 ? previousStreak.streak + 1 : 0;
+      console.log('[DEBUG] No data found for today. Creating a new streak record.');
+
+      streak = streakPoints === 1
+        ? (previousStreak?.streak || 0) + 1
+        : 0;
 
       streakData = await Streak.create({
         date: new Date(localToday),
@@ -188,26 +221,6 @@ app.get('/api/dashboard-data', async (req, res) => {
   }
 });
 
-app.get('/api/streak-history', async (req, res) => {
-  try {
-    console.log('[DEBUG] /api/streak-history: Request received.');
-
-    // Fetch all streak data sorted by date in ascending order
-    const streakHistory = await Streak.find().sort({ date: 1 });
-
-    console.log('[DEBUG] Streak History Fetched:', streakHistory);
-
-    res.json(streakHistory);
-  } catch (error) {
-    console.error('[ERROR] Error fetching streak history:', error);
-    res.status(500).json({ message: 'Internal Server Error', error: error.message });
-  }
-});
-// Start server Locally
-
+// Start the server
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-// Export the app for further use (e.g., Azure Functions, etc.)
-// module.exports = app;
