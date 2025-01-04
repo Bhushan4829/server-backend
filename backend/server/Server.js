@@ -220,7 +220,21 @@ app.get('/api/dashboard-data', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
+app.get('/api/streak-history', async (req, res) => {
+  try {
+    console.log('[DEBUG] /api/streak-history: Request received.');
 
+    // Fetch all streak data sorted by date in ascending order
+    const streakHistory = await Streak.find().sort({ date: 1 });
+
+    console.log('[DEBUG] Streak History Fetched:', streakHistory);
+
+    res.json(streakHistory);
+  } catch (error) {
+    console.error('[ERROR] Error fetching streak history:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+});
 // Start the server
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
