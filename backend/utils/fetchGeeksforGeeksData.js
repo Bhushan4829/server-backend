@@ -1,5 +1,5 @@
 const puppeteer = require("puppeteer-core");
-const path = require("path");
+// const path = require("path");
 
 const fetchGeeksforGeeksData = async () => {
     const username = process.env.GFG_USERNAME || "default_username";
