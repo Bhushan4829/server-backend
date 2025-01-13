@@ -62,7 +62,11 @@ const getLocalDayBoundaries = () => {
   const endOfDay = moment().tz('America/New_York').endOf('day');
   return { startOfDay, endOfDay };
 };
-
+const getUTCBoundariesForLocalDay = () => {
+  const startOfDay = moment().tz('America/New_York').startOf('day').utc();
+  const endOfDay = moment().tz('America/New_York').endOf('day').utc();
+  return { startOfDay, endOfDay };
+};
 // Define Mongoose schema and model
 const streakSchema = new mongoose.Schema({
   date: { type: Date, unique: true, required: true },
@@ -105,7 +109,11 @@ app.get('/api/dashboard-data', async (req, res) => {
 
     const parts = formatter.formatToParts(today);
     const localToday = `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}-${parts.find(p => p.type === 'day').value}`;
-
+    const { startOfDay, endOfDay } = getUTCBoundariesForLocalDay();
+    console.log('[DEBUG] Local Day UTC Boundaries:', {
+      startOfDay: startOfDay.format(),
+      endOfDay: endOfDay.format(),
+    });
     console.log('[DEBUG] Local Today (Adjusted to EST):', localToday);
 
     // Fetch data from external sources concurrently
@@ -138,7 +146,9 @@ app.get('/api/dashboard-data', async (req, res) => {
 
     // Fetch the most recent streak entry (previous day)
     console.log('[DEBUG] Fetching the most recent streak entry...');
-    const previousStreak = await Streak.findOne().sort({ date: -1 });
+    const previousStreak = await Streak.findOne({
+      date: { $lt: startOfDay.toDate() },
+    }).sort({ date: -1 });
     console.log('[DEBUG] Previous Streak:', previousStreak);
 
     // Calculate daily solved problems
@@ -172,11 +182,17 @@ app.get('/api/dashboard-data', async (req, res) => {
     console.log('[DEBUG] Streak Points:', streakPoints);
 
     let streak = 0;
-    let streakData = await Streak.findOne({ date: new Date(localToday) });
+    let streakData = await Streak.findOne({
+      date: { $gte: startOfDay.toDate(), $lt: endOfDay.toDate() },
+    });
 
     if (streakData) {
       console.log('[DEBUG] Streak for today already exists. Re-evaluating streak data.');
-
+      console.log('[DEBUG] Streak Calculation:', {
+        streakPoints,
+        previousStreak: previousStreak?.streak,
+        currentStreak: streakData?.streak,
+      });
       streak = streakPoints === 1
         ? (previousStreak?.streak || 0) + 1
         : 0;
