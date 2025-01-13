@@ -23,6 +23,7 @@ const fetchGeeksforGeeksData = async () => {
                 height: 800,
             },
             // executablePath: localChromePath,
+            channel: 'chrome',
             headless: true,
         });
 
