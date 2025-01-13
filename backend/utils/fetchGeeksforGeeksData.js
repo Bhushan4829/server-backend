@@ -22,7 +22,7 @@ const fetchGeeksforGeeksData = async () => {
                 width: 1280,
                 height: 800,
             },
-            executablePath: localChromePath,
+            // executablePath: localChromePath,
             headless: true,
         });
 
