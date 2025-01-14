@@ -67,6 +67,11 @@ const getUTCBoundariesForLocalDay = () => {
   const endOfDay = moment().tz('America/New_York').endOf('day').utc();
   return { startOfDay, endOfDay };
 };
+const getPreviousDayBoundaries = () => {
+  const previousDayStart = moment().tz('America/New_York').subtract(1, 'day').startOf('day').utc();
+  const previousDayEnd = moment().tz('America/New_York').subtract(1, 'day').endOf('day').utc();
+  return { previousDayStart, previousDayEnd };
+};
 // Define Mongoose schema and model
 const streakSchema = new mongoose.Schema({
   date: { type: Date, unique: true, required: true },
@@ -84,7 +89,6 @@ const Streak = mongoose.model('Streak', streakSchema);
 // Helper function to calculate streak
 const calculateStreak = ({ codingStats, githubStats, taskStats }) => {
   const { startOfDay, endOfDay } = getLocalDayBoundaries();
-
   // Filter tasks completed within the local day
   const completedTasks = taskStats.todayTasks.filter(task => {
     const completedTimeLocal = moment(task.completedTimestamp).tz('America/New_York');
@@ -98,11 +102,12 @@ const calculateStreak = ({ codingStats, githubStats, taskStats }) => {
   const totalPoints = taskPoint + codingPoint + githubPoint;
   return totalPoints >= 2 ? 1 : 0;
 };
-
+const { previousDayStart, previousDayEnd } = getPreviousDayBoundaries();
 // API Endpoint to fetch dashboard data
 app.get('/api/dashboard-data', async (req, res) => {
   try {
     console.log('[DEBUG] /api/dashboard-data: Request received.');
+    console.log('[DEBUG] Stored Streak Dates in DB:', await Streak.find({}, { date: 1 }));
 
     const today = new Date();
     const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -147,8 +152,8 @@ app.get('/api/dashboard-data', async (req, res) => {
     // Fetch the most recent streak entry (previous day)
     console.log('[DEBUG] Fetching the most recent streak entry...');
     const previousStreak = await Streak.findOne({
-      date: { $lt: startOfDay.toDate() },
-    }).sort({ date: -1 });
+      date: { $gte: previousDayStart.toDate(), $lte: previousDayEnd.toDate() },
+    }).sort({ date: -1 });    
     console.log('[DEBUG] Previous Streak:', previousStreak);
 
     // Calculate daily solved problems

@@ -3,18 +3,19 @@
   position: fixed;
   left: 0;
   top: 0;
-  width: 300px; /* Fixed width for desktop */
-  height: 100vh; /* Full height to cover the viewport */
-  background-color: #131c21; /* Matches the website background */
-  color: #4caf50; /* Consistent green color for the text */
+  width: 300px; /* Desktop width */
+  height: 100vh; /* Full height */
+  background-color: #131c21;
+  color: #4caf50;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Align content at the top */
-  align-items: center; /* Center content horizontally */
-  padding: 20px 0; /* Adds some padding at the top and bottom */
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow effect */
-  z-index: 1000; /* Ensures the navbar stays on top */
-  transition: width 0.3s ease; /* Smooth transition for width */
+  justify-content: center; /* Center content vertically */
+  align-items: center;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  overflow-y: auto;
 }
 
 /* Name button styling */
@@ -22,17 +23,18 @@
   background-color: #4caf50;
   color: #131c21;
   padding: 10px 20px;
-  border-radius: 50px; /* Rounded button effect */
-  font-size: 1.5rem;
+  border-radius: 50px;
+  font-size: calc(1rem + 0.5vw); /* Responsive font size */
   text-align: center;
   margin-bottom: 20px;
   cursor: pointer;
+  font-weight: bold;
   transition: background-color 0.3s, transform 0.3s;
 }
 
 .name-button:hover {
   background-color: #3a9c3f;
-  transform: scale(1.05); /* Slight scale effect on hover */
+  transform: scale(1.05);
 }
 
 /* Navigation links styling */
@@ -40,37 +42,73 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  width: 100%; /* Makes the list full width */
+  width: 100%;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* Responsive gap for desktop */
 }
 
 .navigation-bar li {
-  margin: 10px 0; /* Space between each navigation item */
+  margin: 0;
 }
 
 .navigation-bar a {
   text-decoration: none;
-  color: #4caf50; /* Green color */
-  font-size: 1.2rem; /* Larger font size */
-  transition: color 0.3s; /* Smooth color transition on hover */
+  color: #4caf50;
+  font-size: calc(1rem + 0.2vw); /* Responsive font size */
+  font-weight: 600;
+  transition: color 0.3s, transform 0.3s;
 }
 
 .navigation-bar a:hover {
-  color: #3a9c3f; /* Darker green on hover */
+  color: #3a9c3f;
+  transform: scale(1.05);
 }
 
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
   .navigation-bar {
-    width: 200px; /* Adjust width for smaller screens */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 60px; /* Adjusted height for horizontal layout */
+    flex-direction: row;
+    justify-content: center; /* Center the navigation items horizontally */
+    align-items: center;
+    padding: 0 10px; /* Reduced padding for smaller screens */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    overflow-x: auto;
   }
 
-  .name-button {
-    font-size: 1.2rem;
-    padding: 8px 15px;
+  .navigation-bar ul {
+    flex-direction: row; /* Horizontal layout */
+    gap: 1rem; /* Dynamic spacing */
+    justify-content: center; /* Center the list items */
+    align-items: center; /* Align items vertically */
+    padding: 0;
+    margin: 0;
+  }
+
+  .navigation-bar li {
+    margin: 0; /* Reset margin for list items */
   }
 
   .navigation-bar a {
-    font-size: 1rem; /* Adjust font size for links */
+    font-size: 0.9rem; /* Smaller font for compact screens */
+    display: inline-block; /* Ensure proper alignment */
+    text-align: center;
+  }
+}
+
+/* Further adjustments for very small screens */
+@media (max-width: 576px) {
+  .navigation-bar ul {
+    gap: 0.8rem; /* Reduce gap for very small screens */
+  }
+
+  .navigation-bar a {
+    font-size: 0.8rem; /* Compact font size */
   }
 }

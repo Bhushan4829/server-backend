@@ -8,7 +8,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
+
 .projects-section h2 {
   font-size: 2.5rem;
   margin-bottom: 30px;
@@ -16,14 +18,36 @@
 }
 
 .projects-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  width: 100%; /* Ensures grid spans the entire section */
-  max-width: 1200px; /* Limits the grid width for better readability */
+  display: flex; /* Horizontal scrolling layout */
+  flex-wrap: nowrap; /* Prevent wrapping */
+  gap: 20px; /* Space between project cards */
+  width: 100%; /* Full width of the section */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  padding-bottom: 10px; /* Add padding for scrollbar visibility */
+  scroll-behavior: smooth; /* Smooth scrolling effect */
+  justify-content: flex-start; /* Always start from the first project */
+  scroll-padding-left: 0px; /* Prevent clipping of the first card */
+}
+
+.projects-list.more-projects {
+  justify-content: flex-start; /* Left-align when there are enough projects to scroll */
+}
+
+.projects-list::-webkit-scrollbar {
+  height: 10px; /* Height of the horizontal scrollbar */
+}
+
+.projects-list::-webkit-scrollbar-thumb {
+  background-color: #4caf50; /* Custom scrollbar color */
+  border-radius: 10px; /* Rounded scrollbar thumb */
+}
+
+.projects-list::-webkit-scrollbar-track {
+  background-color: #1a1f25; /* Scrollbar track color */
 }
 
 .project-card {
+  flex: 0 0 300px; /* Fixed card width */
   display: flex;
   flex-direction: column;
   background-color: #1a1f25;
@@ -33,11 +57,11 @@
 }
 
 .project-image {
-  max-width: 100%; /* Allow image to scale with the card */
-  max-height: 200px; /* Limit height for consistency */
-  width: 100%; /* Responsive scaling */
-  height: auto; /* Maintain aspect ratio */
-  object-fit: cover; /* Fit image nicely within its container */
+  max-width: 100%;
+  max-height: 200px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }
 
 .project-content {
@@ -72,10 +96,43 @@
   font-size: 0.9rem;
 }
 
+/* Adjustments for smaller screens */
 @media (max-width: 768px) {
   .projects-section {
     margin-left: 0;
-    max-width: 100%; /* Full width for mobile */
+    max-width: 100%;
     padding: 30px 15px;
+  }
+
+  .projects-list {
+    gap: 15px; /* Reduced spacing for smaller screens */
+    scroll-padding-left: 15px; /* Ensure the first project is fully visible */
+  }
+
+  .project-card {
+    flex: 0 0 250px; /* Reduce card width for smaller screens */
+  }
+}
+
+@media (max-width: 576px) {
+  .projects-list {
+    gap: 10px; /* Tighter spacing for very small screens */
+    scroll-padding-left: 10px; /* Ensure the first project is fully visible */
+  }
+
+  .project-card {
+    flex: 0 0 200px; /* Further reduce card width */
+  }
+
+  .project-content h3 {
+    font-size: 1.3rem; /* Adjust heading size */
+  }
+
+  .project-content p {
+    font-size: 0.9rem; /* Adjust paragraph size */
+  }
+
+  .project-tag {
+    font-size: 0.8rem; /* Adjust tag font size */
   }
 }

@@ -1,19 +1,20 @@
 .education-section {
   padding: 50px 20px;
-  background-color: #131c21; /* Dark background */
+  background-color: #131c21;
   color: white;
   text-align: center;
   margin-left: 300px; /* Adjusts for the navigation bar width */
   max-width: calc(100% - 300px); /* Centers the section within the remaining space */
+  transition: margin-left 0.3s ease, max-width 0.3s ease; /* Smooth responsiveness */
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .education-section h2 {
-  font-size: 2.5rem;
-  margin-bottom: 30px;
-  color: #4caf50; /* Green accent for the header */
+  font-size: calc(2rem + 0.5vw); /* Responsive heading size */
+  margin-bottom: 20px;
+  color: #4caf50;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,20 +26,21 @@
 }
 
 .education-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Flexible grid layout */
+  gap: 20px; /* Space between cards */
   max-width: 900px;
+  width: 100%;
   margin: 0 auto; /* Centers content within the section */
 }
 
 .education-card {
-  background-color: #1a1f25; /* Card background matches the section */
+  background-color: #1a1f25;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   text-align: left;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
 }
 
 .education-card:hover {
@@ -47,27 +49,27 @@
 }
 
 .education-date {
-  font-size: 0.9rem;
-  color: #4caf50; /* Green for emphasis */
+  font-size: calc(0.8rem + 0.2vw); /* Responsive font size */
+  color: #4caf50;
   margin-bottom: 10px;
 }
 
 .education-title {
-  font-size: 1.5rem;
+  font-size: calc(1.2rem + 0.3vw); /* Responsive title size */
   margin-bottom: 10px;
-  color: white; /* Title remains white */
+  color: white;
 }
 
 .education-institution {
-  font-size: 1.2rem;
+  font-size: calc(1rem + 0.2vw); /* Responsive institution size */
   margin-bottom: 10px;
-  color: #f2c94c; /* Accent color for institution names */
+  color: #f2c94c;
 }
 
 .education-description {
-  font-size: 1rem;
-  color: #a9a9a9; /* Light gray for readability */
-  white-space: pre-line; /* Ensures line breaks in descriptions */
+  font-size: calc(0.9rem + 0.1vw); /* Responsive description size */
+  color: #a9a9a9;
+  white-space: pre-line;
   margin-bottom: 15px;
   line-height: 1.6;
 }
@@ -77,5 +79,23 @@
     margin-left: 0; /* Reset margin on small screens */
     max-width: 100%; /* Use full width */
     padding: 30px 15px;
+  }
+
+  .education-container {
+    gap: 15px; /* Reduce gap for smaller screens */
+  }
+}
+
+@media (max-width: 576px) {
+  .education-section {
+    padding: 20px 10px; /* Compact padding for small screens */
+  }
+
+  .education-container {
+    gap: 10px; /* Tighter spacing for very small screens */
+  }
+
+  .education-card {
+    padding: 15px; /* Reduce padding inside cards */
   }
 }

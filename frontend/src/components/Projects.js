@@ -12,6 +12,13 @@ function Projects() {
       tags: ['Python', 'Random Forest', 'Blenderbot API', 'RAG', 'GPT-3.5'],
     },
     {
+      title: 'Novel Based Chat-bot',
+      description:
+        'This project presents an innovative chatbot system based on 15 different novels and chit-chat mode. The system operates through a structured backend and frontend, utilizing a Random Forest classifier and OpenAI GPT-3.5 for contextual responses. The frontend is a user-centric web application designed to enhance usability with robust error handling and visualization.',
+      image: project2,
+      tags: ['Python', 'Random Forest', 'Blenderbot API', 'RAG', 'GPT-3.5'],
+    },
+    {
       title: 'Nature Inspired Algorithms for Underwater Object Detection',
       description:
         'In my final year project, my team and I developed an efficient method for detecting objects in underwater environments. Combining pre-trained deep learning models with nature-inspired algorithms, we achieved 98.18% accuracy while reducing computational costs by over 50%. This breakthrough has significant potential in marine research, environmental monitoring, and underwater robotics.',
