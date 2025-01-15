@@ -1,5 +1,5 @@
 # Start with a Node.js base image
-FROM node:14-slim
+FROM node:18-slim
 
 # Install Chrome for Puppeteer
 RUN apt-get update && apt-get install -y \
@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install -y \
     libxrandr2 \
     xdg-utils \
     libu2f-udev \
-    libvpx5 \
     --no-install-recommends \
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install \
