@@ -33,10 +33,20 @@ app.get('/auth/google/callback', async (req, res) => {
     if (tokens.refresh_token) {
       console.log('Saving new refresh token');
       try {
-        fs.writeFileSync('./refresh_token.json', JSON.stringify({ refresh_token: tokens.refresh_token }));
-        console.log('Refresh token saved successfully');
+        // Load the current .env file content
+        const envFilePath = './.env';
+        const envContent = fs.existsSync(envFilePath) ? fs.readFileSync(envFilePath, 'utf8') : '';
+
+        // Replace the existing REFRESH_TOKEN or append it if it doesn't exist
+        const updatedEnvContent = envContent.includes('REFRESH_TOKEN=')
+          ? envContent.replace(/REFRESH_TOKEN=.*/, `REFRESH_TOKEN=${tokens.refresh_token}`)
+          : `${envContent.trim()}\nREFRESH_TOKEN=${tokens.refresh_token}`;
+
+        // Write the updated content back to the .env file
+        fs.writeFileSync(envFilePath, updatedEnvContent, 'utf8');
+        console.log('Refresh token saved successfully to .env');
       } catch (err) {
-        console.error('Error saving refresh token:', err);
+        console.error('Error saving refresh token to .env:', err);
       }
     } else {
       console.log('No refresh token provided in the response');
@@ -72,6 +82,7 @@ const getPreviousDayBoundaries = () => {
   const previousDayEnd = moment().tz('America/New_York').subtract(1, 'day').endOf('day').utc();
   return { previousDayStart, previousDayEnd };
 };
+
 // Define Mongoose schema and model
 const streakSchema = new mongoose.Schema({
   date: { type: Date, unique: true, required: true },
@@ -89,7 +100,6 @@ const Streak = mongoose.model('Streak', streakSchema);
 // Helper function to calculate streak
 const calculateStreak = ({ codingStats, githubStats, taskStats }) => {
   const { startOfDay, endOfDay } = getLocalDayBoundaries();
-  // Filter tasks completed within the local day
   const completedTasks = taskStats.todayTasks.filter(task => {
     const completedTimeLocal = moment(task.completedTimestamp).tz('America/New_York');
     return completedTimeLocal.isBetween(startOfDay, endOfDay, null, '[)');
@@ -102,24 +112,18 @@ const calculateStreak = ({ codingStats, githubStats, taskStats }) => {
   const totalPoints = taskPoint + codingPoint + githubPoint;
   return totalPoints >= 2 ? 1 : 0;
 };
-const { previousDayStart, previousDayEnd } = getPreviousDayBoundaries();
+
 // API Endpoint to fetch dashboard data
 app.get('/api/dashboard-data', async (req, res) => {
   try {
     console.log('[DEBUG] /api/dashboard-data: Request received.');
-    console.log('[DEBUG] Stored Streak Dates in DB:', await Streak.find({}, { date: 1 }));
 
-    const today = new Date();
-    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
-
-    const parts = formatter.formatToParts(today);
-    const localToday = `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}-${parts.find(p => p.type === 'day').value}`;
+    const localTodayISO = moment().tz('America/New_York').startOf('day').toISOString();
     const { startOfDay, endOfDay } = getUTCBoundariesForLocalDay();
     console.log('[DEBUG] Local Day UTC Boundaries:', {
       startOfDay: startOfDay.format(),
       endOfDay: endOfDay.format(),
     });
-    console.log('[DEBUG] Local Today (Adjusted to EST):', localToday);
 
     // Fetch data from external sources concurrently
     console.log('[DEBUG] Fetching data from external sources...');
@@ -128,126 +132,74 @@ app.get('/api/dashboard-data', async (req, res) => {
       codingStatsGeeksforGeeks,
       githubStats,
       taskStats,
-    ] = await Promise.all([
-      fetchLeetCodeData().then((data) => {
-        console.log('[DEBUG] LeetCode Data Fetched:', data);
-        return data;
-      }),
-      fetchGeeksforGeeksData().then((data) => {
-        console.log('[DEBUG] GeeksforGeeks Data Fetched:', data);
-        return data;
-      }),
-      fetchGitHubData().then((data) => {
-        console.log('[DEBUG] GitHub Data Fetched:', data);
-        return data;
-      }),
-      fetchGoogleTasks().then((data) => {
-        console.log('[DEBUG] Google Tasks Data Fetched:', data);
-        return data;
-      }),
+    ] = await Promise.allSettled([
+      fetchLeetCodeData(),
+      fetchGeeksforGeeksData(),
+      fetchGitHubData(),
+      fetchGoogleTasks(),
     ]);
+
+    // Log any rejected fetches
+    if (taskStats.status === 'rejected') {
+      console.error('[ERROR] Failed to fetch Google Tasks:', taskStats.reason);
+    }
 
     console.log('[DEBUG] All external data fetched successfully.');
 
-    // Fetch the most recent streak entry (previous day)
-    console.log('[DEBUG] Fetching the most recent streak entry...');
+    const { previousDayStart, previousDayEnd } = getPreviousDayBoundaries();
     const previousStreak = await Streak.findOne({
       date: { $gte: previousDayStart.toDate(), $lte: previousDayEnd.toDate() },
-    }).sort({ date: -1 });    
-    console.log('[DEBUG] Previous Streak:', previousStreak);
+    }).sort({ date: -1 });
 
-    // Calculate daily solved problems
     const leetcodeDailySolved = previousStreak
       ? Math.max(
-          (codingStatsLeetCode.totalProblemsSolved || 0) -
+          (codingStatsLeetCode.value?.totalProblemsSolved || 0) -
             (previousStreak.codingStatsLeetCode?.totalProblemsSolved || 0),
           0
         )
-      : codingStatsLeetCode.totalProblemsSolved || 0;
+      : 0; // Default to 0 if no previous data
 
     const geeksDailySolved = previousStreak
       ? Math.max(
-          (codingStatsGeeksforGeeks.totalProblemsSolved || 0) -
+          (codingStatsGeeksforGeeks.value?.totalProblemsSolved || 0) -
             (previousStreak.codingStatsGeeksforGeeks?.totalProblemsSolved || 0),
           0
         )
-      : codingStatsGeeksforGeeks.totalProblemsSolved || 0;
-
-    console.log('[DEBUG] Data passed to calculateStreak:', {
-      codingStats: { leetcodeDailySolved, geeksDailySolved },
-      githubStats,
-      taskStats,
-    });
+      : 0; // Default to 0 if no previous data
 
     const streakPoints = calculateStreak({
       codingStats: { leetcodeDailySolved, geeksDailySolved },
-      githubStats,
-      taskStats,
-    });
-    console.log('[DEBUG] Streak Points:', streakPoints);
-
-    let streak = 0;
-    let streakData = await Streak.findOne({
-      date: { $gte: startOfDay.toDate(), $lt: endOfDay.toDate() },
+      githubStats: githubStats.value,
+      taskStats: taskStats.value || { todayTasks: [] },
     });
 
-    if (streakData) {
-      console.log('[DEBUG] Streak for today already exists. Re-evaluating streak data.');
-      console.log('[DEBUG] Streak Calculation:', {
-        streakPoints,
-        previousStreak: previousStreak?.streak,
-        currentStreak: streakData?.streak,
-      });
-      streak = streakPoints === 1
-        ? (previousStreak?.streak || 0) + 1
-        : 0;
-
-      streakData = await Streak.findOneAndUpdate(
-        { date: new Date(localToday) },
-        {
-          streak,
-          codingStatsLeetCode,
-          codingStatsGeeksforGeeks,
-          leetcodeDailySolved,
-          geeksDailySolved,
-          githubStats,
-          taskStats,
-        },
-        { new: true }
-      );
-    } else {
-      console.log('[DEBUG] No data found for today. Creating a new streak record.');
-
-      streak = streakPoints === 1
-        ? (previousStreak?.streak || 0) + 1
-        : 0;
-
-      streakData = await Streak.create({
-        date: new Date(localToday),
-        streak,
-        codingStatsLeetCode,
-        codingStatsGeeksforGeeks,
+    const updatedStreak = await Streak.findOneAndUpdate(
+      { date: new Date(localTodayISO) },
+      {
+        streak: streakPoints === 1 ? (previousStreak?.streak || 0) + 1 : 0,
+        codingStatsLeetCode: codingStatsLeetCode.value || {},
+        codingStatsGeeksforGeeks: codingStatsGeeksforGeeks.value || {},
         leetcodeDailySolved,
         geeksDailySolved,
-        githubStats,
-        taskStats,
-      });
-    }
+        githubStats: githubStats.value || {},
+        taskStats: taskStats.value || { todayTasks: [] },
+      },
+      { upsert: true, new: true }
+    );
 
-    console.log('[DEBUG] Updated Streak Data:', streakData);
-    res.json(streakData);
+    console.log('[DEBUG] Updated Streak Data:', updatedStreak);
+    res.json(updatedStreak);
   } catch (error) {
     console.error('[ERROR] Error fetching dashboard data:', error);
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
+
 app.get('/api/streak-history', async (req, res) => {
   try {
     console.log('[DEBUG] /api/streak-history: Request received.');
 
-    // Fetch all streak data sorted by date in ascending order
     const streakHistory = await Streak.find().sort({ date: 1 });
-
     console.log('[DEBUG] Streak History Fetched:', streakHistory);
 
     res.json(streakHistory);
@@ -256,6 +208,7 @@ app.get('/api/streak-history', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
+
 // Start the server
-const PORT = 5000;
+const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
