@@ -37,12 +37,12 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         // const response = await axios.get('https://backend-nsyi.onrender.com/api/dashboard-data');
-        const response = await axios.get('http://localhost:5000/api/dashboard-data');
+        const response = await axios.get('https://backend-portfolio-latest-yrlb.onrender.com/api/dashboard-data');
         setData(response.data);
 
         // Fetch streak history
         // const streakResponse = await axios.get('https://backend-nsyi.onrender.com/api/streak-history');
-        const streakResponse = await axios.get('http://localhost:5000/api/streak-history');
+        const streakResponse = await axios.get('https://backend-portfolio-latest-yrlb.onrender.com/api/streak-history');
         setStreakHistory(streakResponse.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -52,7 +52,6 @@ function Dashboard() {
   }, []);
 
   if (!data) return <p>Loading...</p>;
-
   // Safeguards to handle missing or undefined properties
   const codingStats = data.codingStats || {};
   const taskStats = data.taskStats || {};
