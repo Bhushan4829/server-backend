@@ -29,13 +29,21 @@ function Home({ navigate }) {
             Hi, I am <span>Bhushan Mahajan</span>
           </h1>
           <p>
-            A passionate software engineer specializing in building high-quality web applications with React and Django.
-            I have over 2 years of experience in web development and am currently pursuing my interest in data science
-            and machine learning.
+            I'm a passionate Machine Learning Engineer who specializes in creating scalable and high-performance applications. 
+            Currently pursuing my Master's in Computer Science at the University at Buffalo, I thrive on solving challenging 
+            problems and delivering impactful solutions that make a difference.
           </p>
           <p>
-            I enjoy solving complex problems, collaborating with teams, and delivering user-centric solutions. My
-            expertise lies in leveraging modern tools and frameworks to create scalable and efficient applications.
+            I’m constantly exploring ways to leverage tools like LangChain, Docker, and Azure to bridge the gap 
+            between complex technical solutions and seamless user experiences.With expertise spanning AI, 
+            Data Engineering, and Cloud Technologies (Azure and AWS), I’ve worked on projects involving 
+            advanced machine learning workflows, scalable data pipelines, and AI-driven solutions that 
+            empower businesses to make informed decisions.
+          </p>
+          <p>
+            🔍 I am actively seeking full-time opportunities as a Machine Learning Engineer, AI Engineer, 
+            or Data Engineer, where I can apply my skills and creativity to solve real-world problems.
+            Let’s connect and create something amazing together! 🚀
           </p>
           <div className="buttons">
             <button>Download CV</button>
