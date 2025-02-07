@@ -1,3 +1,12 @@
+# Running Code
+ !git clone https://github.com/Bhushan4829/server-backend
+
+# Enter into backend folder
+!cd Scripts
+
+# Enter into Frontend Folder
+!cd frontend
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
