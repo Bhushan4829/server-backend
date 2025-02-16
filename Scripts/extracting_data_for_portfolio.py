@@ -1,215 +1,124 @@
-import openai
-import requests
-from bs4 import BeautifulSoup
-import fitz  # PyMuPDF for PDF processing
-from docx import Document
-import json
-import os
 import pandas as pd
-import uuid
-import dotenv
+from sqlalchemy import create_engine
+# Path to the CSV file
+# csv_file_path = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQMgTJZHoKjf1Rb6eQ4hzY-sfOZHJb6qxQTMZnvT7SYQ8IasB8NeA7fKetDVgLg0gxYiuTbd-FjXl9R/pub?gid=0&single=true&output=csv'
+# data = pd.read_csv(csv_file_path)
 
-dotenv.load_dotenv()
-CSV_FILENAME = "projects_data.csv"
+# column_mapping = {
+#     'Id': 'id',
+#     'Title': 'title',
+#     'Description': 'description',
+#     'Technologies': 'technologies',
+#     'Github_Link': 'github_link',
+#     'Medium_Link': 'medium_link',
+#     'Deployment_Link': 'deployment_link',
+#     'Document_Link': 'document_link',
+#     'Report_Link': 'report_link'
+# }
+# data.rename(columns=column_mapping, inplace=True)
+# print(data.columns)
+# # Replace the below string with your connection details
+# # database_url = "postgresql://postgres:postgres@localhost:5432/portfolio_db"
+# # engine = create_engine(database_url)
 
-# OpenAI API Key Setup
-openai.api_key = {os.getenv('OPENAI_API_KEY')}
+# # # Insert data into the database
+# # data.to_sql('projects', con=engine, if_exists='append', index=False)
+# from sqlalchemy import create_engine
 
-def extract_text_from_pdf(file_path):
-    """Extract text from a PDF file and verify extraction."""
-    try:
-        text = ''
-        doc = fitz.open(file_path)
-        for page in doc:
-            text += page.get_text()
-        print(f"Extracted PDF Text (First 500 chars): {text[:500]}")  # Debug
-        return text
-    except Exception as e:
-        return f"Error reading PDF: {str(e)}"
-
-def extract_text_from_docx(file_path):
-    """Extract text from a DOCX file and verify extraction."""
-    try:
-        doc = Document(file_path)
-        text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
-        print(f"Extracted DOCX Text (First 500 chars): {text[:500]}")  # Debug
-        return text
-    except Exception as e:
-        return f"Error reading DOCX: {str(e)}"
-
-def fetch_github_readme(github_link):
-    """Fetches the README.md content from GitHub repository."""
-    try:
-        # Convert GitHub link to raw content URL
-        repo_name = github_link.split("github.com/")[-1]
-        raw_url = f"https://raw.githubusercontent.com/{repo_name}/main/README.md"
-
-        response = requests.get(raw_url)
-        if response.status_code == 200:
-            return response.text[:2000]  # Limit to avoid token limit
-        else:
-            return "Error fetching GitHub README."
-    except Exception as e:
-        return f"GitHub error: {str(e)}"
-
-def fetch_and_summarize(url, context="general"):
-    """Fetch text from a webpage and summarize it dynamically."""
-    try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
-        text = ' '.join(p.text for p in soup.find_all('p'))
-
-        return generate_summary(text, context)
-    except Exception as e:
-        return f"Error fetching URL {url}: {str(e)}"
-
-def generate_summary(text, context="general"):
-    """Generate a concise summary with a context-specific prompt."""
-    prompt = f"Summarize the following text with a focus on {context}:\n\n{text}"
-    
-    response = openai.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "system", "content": "You are an AI assistant that summarizes documents accurately."},
-                  {"role": "user", "content": prompt}],
-        max_tokens=200
-    )
-
-    return response.choices[0].message.content.strip()
-
-# def extract_technologies(text):
-#     """Extract technologies into structured categories."""
-#     prompt = f"""
-#     Identify and classify all technologies mentioned in the following text into programming languages, frameworks, libraries, cloud services, and tools:
-    
-#     {text}
-    
-#     Respond in JSON format like this:
-#     {{
-#       "languages": [],
-#       "frameworks": [],
-#       "libraries": [],
-#       "cloud_services": [],
-#       "tools": []
-#     }}
+# def upsert(engine, table_name, df, unique_columns):
 #     """
-    
-#     response = openai.chat.completions.create(
-#         model="gpt-4o",
-#         messages=[{"role": "system", "content": "Extract and categorize technologies accurately."},
-#                   {"role": "user", "content": prompt}],
-#         max_tokens=300
-#     )
-    
-#     try:
-#         return json.loads(response.choices[0].message.content)
-#     except json.JSONDecodeError:
-#         return {"languages": [], "frameworks": [], "libraries": [], "cloud_services": [], "tools": []}
-def save_to_csv(project, csv_filename=CSV_FILENAME):
-    """
-    Saves or updates project data in a CSV file.
-    - If the project already exists (same title), it updates the row.
-    - Otherwise, it appends a new row.
-    """
-    if os.path.exists(csv_filename):
-        df = pd.read_csv(csv_filename)
-    else:
-        df = pd.DataFrame(columns=["id", "title", "description", "technologies", "github_link",
-                                   "medium_link", "deployment_link", "document_link", "report_link"])
+#     Upsert rows from a DataFrame to a PostgreSQL table using raw SQL.
 
-    existing_index = df[df["title"] == project["title"]].index
+#     :param engine: SQLAlchemy engine object
+#     :param table_name: Name of the table in the database
+#     :param df: DataFrame containing the data to insert
+#     :param unique_columns: List or string of column names that are used for identifying duplicate rows
+#     """
+#     # Create a list of columns
+#     columns = ', '.join(df.columns)
+#     # Create a list of values placeholders
+#     values = ', '.join(['%s' for _ in df.columns])
+#     # Create a list of columns for the ON CONFLICT clause
+#     update_columns = ', '.join([f"{col} = EXCLUDED.{col}" for col in df.columns if col not in unique_columns])
 
-    if existing_index.empty:
-        project["id"] = str(uuid.uuid4())  # New unique ID
-    else:
-        project["id"] = df.loc[existing_index[0], "id"]  # Keep existing ID
+#     # Create the SQL statement
+#     sql = f"""
+#     INSERT INTO {table_name} ({columns})
+#     VALUES ({values})
+#     ON CONFLICT ({unique_columns}) DO UPDATE SET
+#     {update_columns};
+#     """
 
-    project["technologies"] = json.dumps(project["technologies"])
-    project["medium_link"] = ", ".join(project["medium_links"]) if project["medium_links"] else ""
+#     # Execute the SQL statement
+#     with engine.connect() as conn:
+#         for _, row in df.iterrows():
+#             conn.execute(sql, tuple(row))
 
-    new_data = pd.DataFrame([project])
+# # Example usage
+# database_url = "postgresql://postgres:postgres@localhost:5432/portfolio_db"
+# engine = create_engine(database_url)
 
-    if existing_index.empty:
-        df = pd.concat([df, new_data], ignore_index=True)
-        print(f"✅ Appended new project: {project['title']}")
-    else:
-        df.loc[existing_index[0]] = new_data.iloc[0]  # Update
-        print(f"🔄 Updated project: {project['title']}")
-
-    df.to_csv(csv_filename, index=False)
-    return project["id"]
-def process_projects(projects):
-    """Process a list of projects dynamically."""
-    processed_projects = []
-
-    for project in projects:
-        print(f"Processing {project['title']}...")
-
-        # Extract project report text
-        if project['report_link'].endswith('.pdf'):
-            report_text = extract_text_from_pdf(project['report_link'])
-        elif project['report_link'].endswith('.docx'):
-            report_text = extract_text_from_docx(project['report_link'])
-        else:
-            report_text = "Unsupported format or missing report."
-
-        # Summarize GitHub README
-        github_summary = fetch_and_summarize(project['github_link'] + '/README.md', context="project overview")
-        print(f"GitHub Summary: {github_summary}")  # Debug
-        # Process Medium articles
-        medium_summaries = ' '.join(fetch_and_summarize(link, context="blog insights") for link in project['medium_links'])
-        print(f"Medium Summaries: {medium_summaries}")  # Debug
-        # Combine all text sources
-        combined_text = f"{github_summary}\n{medium_summaries}\n{report_text}"
-
-        # Generate final summary
-        final_summary = generate_summary(combined_text, context="technical project insights")
-
-        # Extract technologies
-        # technologies = extract_technologies(combined_text)
-        
-        technologies = {
-                "languages": ["Python"],
-                "frameworks": ["Scikit-learn"],
-                "libraries": ["XGBoost", "Pandas", "NumPy"],
-                "cloud_services": ["Render"],
-                "tools": ["Jupyter Notebook","VSCode","Docker"],
-                "Areas": ["Machine Learning", "Data Science","Data Cleaning","Data Preprocessing","Data Visualization","Model Building","Model Deployment"]
-            }
-        processed_project = {
-            'title': project['title'],
-            'description': final_summary,
-            'technologies': technologies,
-            'github_link': project['github_link'],
-            'medium_links': project['medium_links'],
-            'deployment_link': project['deployment_link'],
-            'report_link': "",
-            'document_link': ""
-        }
+# # Assuming 'data' is your DataFrame and it includes 'id' as a unique identifier
+# upsert(engine, 'projects', data, 'id')
 
 
-        processed_projects.append(processed_project)
 
-    return processed_projects
+# Experiende Table: https://docs.google.com/spreadsheets/d/e/2PACX-1vQMgTJZHoKjf1Rb6eQ4hzY-sfOZHJb6qxQTMZnvT7SYQ8IasB8NeA7fKetDVgLg0gxYiuTbd-FjXl9R/pubhtml
 
-# Example project data structure
-projects_info = [
-    {
-        'title': 'GDP Prediction using XGBoost',
-        'github_link': 'https://github.com/Bhushan4829/GDP_Prediction_using_xgboost',
-        'medium_links': [],
-        'deployment_link': 'https://gdp-prediction-app.onrender.com/',
-        'report_link': 'D:/MS/project_report/GDP_Prediction_using_XgBoost.pdf'
-    }
-    {
-        
-        'title': 'GDP Prediction using XGBoost',
-        'github_link': 'https://github.com/Bhushan4829/GDP_Prediction_using_xgboost',
-        'medium_links': [],
-        'deployment_link': 'https://gdp-prediction-app.onrender.com/',
-        'report_link': 'D:/MS/project_report/GDP_Prediction_using_XgBoost.pdf'
-    }
-]
+import pandas as pd
+from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.dialects.postgresql import insert
 
-# Processing projects
-processed_projects = process_projects(projects_info)
-print(json.dumps(processed_projects, indent=4))
+# Load your Excel file
+csv_file_exp = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQMgTJZHoKjf1Rb6eQ4hzY-sfOZHJb6qxQTMZnvT7SYQ8IasB8NeA7fKetDVgLg0gxYiuTbd-FjXl9R/pub?output=xlsx'
+data_skills = pd.read_excel(csv_file_exp, sheet_name='Sheet3')
+data_experience = pd.read_excel(csv_file_exp, sheet_name='Sheet2')
+data_certifications = pd.read_excel(csv_file_exp, sheet_name='Sheet4')
+print("Data Skills",data_skills)
+print("Data Experience",data_experience)
+print("Data Certifications",data_certifications)
+# Convert 'NaT' to None for date columns in experience and certifications
+data_experience['start_date'] = pd.to_datetime(data_experience['start_date'], errors='coerce')
+data_experience['end_date'] = pd.to_datetime(data_experience['end_date'], errors='coerce')
+data_certifications['issue_date'] = pd.to_datetime(data_certifications['issue_date'], errors='coerce')
+data_certifications['expiration_date'] = pd.to_datetime(data_certifications['expiration_date'], errors='coerce')
+
+# Database connection URL
+database_url = "postgresql://postgres:postgres@localhost:5432/portfolio_db"
+engine = create_engine(database_url)
+
+# Reflect the existing tables from the database
+metadata = MetaData()
+metadata.reflect(bind=engine)
+
+skills_table = metadata.tables['skills']
+experience_table = metadata.tables['experience']
+certifications_table = metadata.tables['certifications']
+
+def upsert_data(table, df, primary_keys):
+    with engine.connect() as conn:
+        transaction = conn.begin()  # Start transaction
+        try:
+            for index, row in df.iterrows():
+                # Prepare data, setting NaT to None
+                row_dict = {k: None if pd.isna(v) else v for k, v in row.items()}
+                insert_stmt = insert(table).values(**row_dict)
+                on_conflict_stmt = insert_stmt.on_conflict_do_update(
+                    index_elements=primary_keys,
+                    set_={k: v for k, v in row_dict.items() if k not in primary_keys}
+                )
+                conn.execute(on_conflict_stmt)
+            transaction.commit()  # Commit transaction
+        except Exception as e:
+            print("Error during database operation:", e)
+            transaction.rollback()  # Rollback in case of error
+
+
+# Execute the upsert for each table
+upsert_data(skills_table, data_skills, ['id'])
+upsert_data(experience_table, data_experience, ['id'])
+upsert_data(certifications_table, data_certifications, ['id'])
+
+
+
+
