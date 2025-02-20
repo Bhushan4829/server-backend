@@ -202,7 +202,7 @@ projects_info = [
     }
     {
         
-        'title': 'GDP Prediction using XGBoost',
+        'title': 'MedilinkAI- An AI powered healthcare Portal',
         'github_link': 'https://github.com/Bhushan4829/GDP_Prediction_using_xgboost',
         'medium_links': [],
         'deployment_link': 'https://gdp-prediction-app.onrender.com/',
