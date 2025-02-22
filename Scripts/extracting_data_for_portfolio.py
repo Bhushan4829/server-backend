@@ -121,4 +121,22 @@ upsert_data(certifications_table, data_certifications, ['id'])
 
 
 
+# Example project data structure
+projects_info = [
+    {
+        'title': 'GDP Prediction using XGBoost',
+        'github_link': 'https://github.com/Bhushan4829/GDP_Prediction_using_xgboost',
+        'medium_links': [],
+        'deployment_link': 'https://gdp-prediction-app.onrender.com/',
+        'report_link': 'D:/MS/project_report/GDP_Prediction_using_XgBoost.pdf'
+    }
+    {
+        
+        'title': 'MedilinkAI- An AI powered healthcare Portal',
+        'github_link': 'https://github.com/Bhushan4829/GDP_Prediction_using_xgboost',
+        'medium_links': [],
+        'deployment_link': 'https://gdp-prediction-app.onrender.com/',
+        'report_link': 'D:/MS/project_report/GDP_Prediction_using_XgBoost.pdf'
+    }
+]
 
