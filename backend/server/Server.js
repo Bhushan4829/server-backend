@@ -208,7 +208,15 @@ app.get('/api/streak-history', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
+app.get('/api/latest-dashboard-data', async (req, res) => {
+  try {
+    const latestEntry = await Streak.findOne().sort({ date: -1 });
+    res.json(latestEntry);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching latest entry', error: error.message });
+  }
+});
 
 // Start the server
-const PORT = 3000;
+const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

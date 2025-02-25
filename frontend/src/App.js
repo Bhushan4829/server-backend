@@ -6,6 +6,7 @@ import Projects from './components/Projects';
 import Experience from './components/Experience';
 import Dashboard from './components/Dashboards'; // Updated import path
 import NavigationBar from './components/NavigationBar';
+import ConnectWithMe from './components/Contact';
 import './App.css';
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           <Skills />
           <Projects />
           <Experience />
+          <ConnectWithMe />
         </div>
       </>
     );

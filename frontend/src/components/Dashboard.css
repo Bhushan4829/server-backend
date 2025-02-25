@@ -18,6 +18,20 @@
   margin-bottom: 15px;
 }
 
+.update-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  visibility: visible !important;
+}
+
+.update-button:hover {
+  background-color: #45a049;
+}
 .chart-row {
   display: flex;
   flex-wrap: wrap;

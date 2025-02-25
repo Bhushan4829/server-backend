@@ -12,7 +12,23 @@
   align-items: center;
   transition: margin-left 0.3s ease, max-width 0.3s ease;
 }
+.skills-section button {
+  padding: 8px 16px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2c94c; /* Updated button color */
+  color: #131c21; /* Text color for better contrast */
+  cursor: pointer;
+  outline: none;
+}
+.skills-section button:hover {
+  background-color: #c7a43f; /* Darker shade for hover */
+}
 
+.skills-section button:focus {
+  background-color: #a8862e; /* Even darker for focus */
+}
 .skills-section h2 {
   font-size: calc(2rem + 0.5vw); /* Responsive heading size */
   color: #4caf50; /* Green heading color */
@@ -24,9 +40,10 @@
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Dynamic column layout */
   gap: calc(10px + 1vw); /* Responsive spacing between cards */
   justify-items: center; /* Center-align individual cards */
-  width: 100%; /* Ensures the grid spans the section */
+  width: 100%;
+  max-width: 900px; /* Match the max-width of the education section for consistency */
+  margin: 0 auto; /* Centering the grid within the section */
 }
-
 .skill-card {
   display: flex;
   flex-direction: column;

@@ -46,8 +46,9 @@ function Home({ navigate }) {
             Let’s connect and create something amazing together! 🚀
           </p>
           <div className="buttons">
-            <button>Download CV</button>
-            <button>Start Project</button>
+            <button onClick={() => window.open('https://drive.google.com/file/d/1sd3TM-EARBDBdJ4d39Cj0yywthMqAV0b/view?usp=sharing', '_blank')}>
+              View Resume
+            </button>
             <button onClick={() => navigate('/dashboard')}>Track My Consistency</button>
           </div>
         </div>
