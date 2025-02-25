@@ -253,11 +253,11 @@ function Dashboard() {
   const fetchLatestEntry = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://backend-portfolio-latest-yrlb.onrender.com/api/latest-dashboard-data');
+      const response = await axios.get('https://server-backend-j3bt.onrender.com/api/latest-dashboard-data');
       // const response = await axios.get('http://localhost:5000/api/latest-dashboard-data');
       setData(response.data);
 
-      const streakResponse = await axios.get('https://backend-portfolio-latest-yrlb.onrender.com/api/streak-history');
+      const streakResponse = await axios.get('https://server-backend-j3bt.onrender.com/api/streak-history');
       // const streakResponse = await axios.get('http://localhost:5000/api/streak-history');
       console.log("Fetched streak history:", streakResponse.data);
       setStreakHistory(streakResponse.data);
@@ -272,12 +272,12 @@ function Dashboard() {
   const updateData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://backend-portfolio-latest-yrlb.onrender.com/api/dashboard-data'); // This will trigger an update
+      const response = await axios.get('https://server-backend-j3bt.onrender.com/api/dashboard-data'); // This will trigger an update
       // const response = await axios.get('http://localhost:5000/api/dashboard-data');
       console.log('Updated data:', response.data);
       setData(response.data);
       
-      const streakResponse = await axios.get('https://backend-portfolio-latest-yrlb.onrender.com/api/streak-history');
+      const streakResponse = await axios.get('https://server-backend-j3bt.onrender.com/api/streak-history');
       // const streakResponse = await axios.get('http://localhost:5000/api/streak-history');
       console.log("Updated streak history:", streakResponse.data);
       setStreakHistory(streakResponse.data);
