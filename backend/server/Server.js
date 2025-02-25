@@ -100,14 +100,17 @@ const Streak = mongoose.model('Streak', streakSchema);
 // Helper function to calculate streak
 const calculateStreak = ({ codingStats, githubStats, taskStats }) => {
   const { startOfDay, endOfDay } = getLocalDayBoundaries();
-  const completedTasks = taskStats.todayTasks.filter(task => {
+
+  // Ensure taskStats.todayTasks exists
+  const completedTasks = (taskStats?.todayTasks || []).filter(task => {
+    if (!task.completedTimestamp) return false; // Guard against missing timestamps
     const completedTimeLocal = moment(task.completedTimestamp).tz('America/New_York');
     return completedTimeLocal.isBetween(startOfDay, endOfDay, null, '[)');
   });
 
   const taskPoint = completedTasks.length >= 2 ? 1 : 0;
-  const codingPoint = (codingStats.leetcodeDailySolved || 0) + (codingStats.geeksDailySolved || 0) >= 2 ? 1 : 0;
-  const githubPoint = githubStats.commits > 0 ? 1 : 0;
+  const codingPoint = ((codingStats?.leetcodeDailySolved || 0) + (codingStats?.geeksDailySolved || 0)) >= 2 ? 1 : 0;
+  const githubPoint = (githubStats?.commits || 0) > 0 ? 1 : 0;
 
   const totalPoints = taskPoint + codingPoint + githubPoint;
   return totalPoints >= 2 ? 1 : 0;
@@ -173,8 +176,10 @@ app.get('/api/dashboard-data', async (req, res) => {
       taskStats: taskStats.value || { todayTasks: [] },
     });
 
+    const localTodayStartUTC = moment().tz('America/New_York').startOf('day').utc().toISOString();
+
     const updatedStreak = await Streak.findOneAndUpdate(
-      { date: new Date(localTodayISO) },
+      { date: new Date(localTodayStartUTC) }, // Ensures proper UTC conversion
       {
         streak: streakPoints === 1 ? (previousStreak?.streak || 0) + 1 : 0,
         codingStatsLeetCode: codingStatsLeetCode.value || {},
@@ -186,6 +191,7 @@ app.get('/api/dashboard-data', async (req, res) => {
       },
       { upsert: true, new: true }
     );
+
 
     console.log('[DEBUG] Updated Streak Data:', updatedStreak);
     res.json(updatedStreak);
