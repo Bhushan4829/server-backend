@@ -1,0 +1,38 @@
+name: Daily Backend Update
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # Runs at 4:00 AM UTC (which is 11:00 PM EST)
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  update_backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Update backend data
+        run: |
+          curl -X GET "https://server-backend-j3bt.onrender.com/api/dashboard-data"
+
+      - name: Send email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASS }}
+          subject: "Daily Backend Update - Status"
+          body: "The backend update has been triggered successfully at 11:00 PM EST."
+          to: "bhushanmahajan2908@gmail.com"
+          from: "GitHub Actions <bhushanmahajan2908@gmail.com>"
