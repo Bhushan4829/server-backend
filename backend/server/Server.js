@@ -200,6 +200,82 @@ app.get('/api/dashboard-data', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
+// API to manually update streak for a specific date
+app.post('/api/update-streak', async (req, res) => {
+  try {
+    const { date } = req.body; // Expected date format: YYYY-MM-DD
+
+    if (!date) {
+      return res.status(400).json({ message: 'Date is required in YYYY-MM-DD format' });
+    }
+
+    const targetDate = moment.tz(date, 'America/New_York').startOf('day').utc().toISOString();
+    const { startOfDay, endOfDay } = getUTCBoundariesForLocalDay();
+
+    console.log(`[DEBUG] Manually updating streak for ${date} (UTC: ${targetDate})`);
+
+    // Fetch external data for the given date
+    const [
+      codingStatsLeetCode,
+      codingStatsGeeksforGeeks,
+      githubStats,
+      taskStats,
+    ] = await Promise.allSettled([
+      fetchLeetCodeData(),
+      fetchGeeksforGeeksData(),
+      fetchGitHubData(),
+      fetchGoogleTasks(),
+    ]);
+
+    console.log('[DEBUG] External data fetched for manual update.');
+
+    // Find the previous day's streak
+    const previousDayStart = moment(targetDate).subtract(1, 'day').startOf('day').toISOString();
+    const previousDayEnd = moment(targetDate).subtract(1, 'day').endOf('day').toISOString();
+
+    const previousStreak = await Streak.findOne({
+      date: { $gte: previousDayStart, $lte: previousDayEnd },
+    }).sort({ date: -1 });
+
+    const leetcodeDailySolved = previousStreak
+      ? Math.max(
+          (codingStatsLeetCode.value?.totalProblemsSolved || 0) - 
+          (previousStreak.codingStatsLeetCode?.totalProblemsSolved || 0), 0)
+      : 0;
+
+    const geeksDailySolved = previousStreak
+      ? Math.max(
+          (codingStatsGeeksforGeeks.value?.totalProblemsSolved || 0) - 
+          (previousStreak.codingStatsGeeksforGeeks?.totalProblemsSolved || 0), 0)
+      : 0;
+
+    const streakPoints = calculateStreak({
+      codingStats: { leetcodeDailySolved, geeksDailySolved },
+      githubStats: githubStats.value,
+      taskStats: taskStats.value || { todayTasks: [] },
+    });
+
+    const updatedStreak = await Streak.findOneAndUpdate(
+      { date: new Date(targetDate) },
+      {
+        streak: streakPoints === 1 ? (previousStreak?.streak || 0) + 1 : 0,
+        codingStatsLeetCode: codingStatsLeetCode.value || {},
+        codingStatsGeeksforGeeks: codingStatsGeeksforGeeks.value || {},
+        leetcodeDailySolved,
+        geeksDailySolved,
+        githubStats: githubStats.value || {},
+        taskStats: taskStats.value || { todayTasks: [] },
+      },
+      { upsert: true, new: true }
+    );
+
+    console.log('[DEBUG] Manually updated streak:', updatedStreak);
+    res.json(updatedStreak);
+  } catch (error) {
+    console.error('[ERROR] Error updating streak manually:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+});
 
 app.get('/api/streak-history', async (req, res) => {
   try {
