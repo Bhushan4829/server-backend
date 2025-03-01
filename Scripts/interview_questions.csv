@@ -1,0 +1,101 @@
+Category,Question
+Technical Skills,Can you explain the difference between SQL and NoSQL databases? Provide examples.
+Technical Skills,How do you optimize a SQL query for better performance? Give a real-world example.
+Technical Skills,Explain the difference between ETL and ELT with an example from your work.
+Technical Skills,How do you handle missing values in a dataset? Show an example.
+Technical Skills,Describe a time when you optimized a slow-running dashboard/report.
+Technical Skills,"What are window functions in SQL, and when have you used them?"
+Technical Skills,Explain data normalization and how it improves database performance.
+Technical Skills,Can you describe a scenario where you used data warehousing in a project?
+Technical Skills,How do you ensure data quality and integrity in a business intelligence pipeline?
+Technical Skills,Walk me through a Machine Learning project you built from scratch.
+Technical Skills,Explain feature engineering in ML and how it impacts model performance.
+Technical Skills,When would you use random forest over logistic regression?
+Technical Skills,What are the key challenges in deploying machine learning models?
+Technical Skills,Describe how you have used Power BI/Tableau for storytelling with data.
+Technical Skills,What are the advantages of cloud computing for analytics workloads?
+Technical Skills,Can you explain Kafka vs. RabbitMQ in a real-time data processing scenario?
+Technical Skills,What is the most complex data transformation you have written in Python or SQL?
+Technical Skills,What are common pitfalls in API-based data integration?
+Technical Skills,Have you ever had to debug a data pipeline failure in production? What did you do?
+Technical Skills,How would you handle a situation where a model starts drifting over time?
+Behavioral,Tell me about a time when you handled a difficult colleague or stakeholder.
+Behavioral,Give an example of a time when you had to work under tight deadlines.
+Behavioral,How do you handle constructive criticism at work?
+Behavioral,Describe a time when you made a mistake at work and how you handled it.
+Behavioral,Can you give an example of how you prioritize multiple tasks?
+Behavioral,How do you deal with unexpected changes in a project?
+Behavioral,Tell me about a time when you had to explain complex data to a non-technical audience.
+Behavioral,What would you do if you were given a project with unclear goals?
+Behavioral,Describe a time you had to influence a team decision without authority.
+Behavioral,Give an example of when you went above and beyond to deliver results.
+Behavioral,How do you handle difficult clients or business users?
+Behavioral,Have you ever worked on a project where you had to learn a new tool or technology quickly?
+Behavioral,Describe a high-pressure situation and how you managed it.
+Behavioral,What motivates you to do your best work?
+Behavioral,How do you handle work-life balance in a fast-paced job?
+Behavioral,Describe a time when you had to ask for help in a challenging situation.
+Behavioral,"What is the biggest professional risk you have taken, and what did you learn from it?"
+Behavioral,How do you give and receive feedback?
+Behavioral,Can you describe a situation where you had to disagree with your manager?
+Behavioral,Tell me about a time you had to handle conflict within a team.
+Project Based,Walk me through your most impactful project and your role in it.
+Project Based,Have you ever worked on a project with incomplete or missing data? How did you handle it?
+Project Based,Describe a time when you had to change your approach in the middle of a project.
+Project Based,"What was the most complex dataset you worked with, and how did you analyze it?"
+Project Based,Have you worked on a project where you had to integrate multiple data sources?
+Project Based,How do you determine whether a project was successful or not?
+Project Based,Can you describe a situation where you had to troubleshoot a failing project?
+Project Based,What tools have you used for project tracking and documentation?
+Project Based,Describe a project where you had to automate repetitive tasks.
+Project Based,"Have you ever worked on a real-time analytics project? If yes, explain the challenges."
+Project Based,Tell me about a project where you optimized an existing system.
+Project Based,What was the biggest challenge you faced when managing stakeholders in a project?
+Project Based,Have you ever had to handle conflicting requirements from different teams?
+Project Based,How do you approach testing and validating a data pipeline?
+Project Based,Explain a time you had to collaborate with a cross-functional team.
+Project Based,Have you ever worked with unstructured data? How did you analyze it?
+Project Based,What is the most interesting insight you have uncovered in a project?
+Project Based,How do you document your workflow for future team members?
+Project Based,Have you worked on a cloud-based data project? What architecture did you use?
+Project Based,What steps do you take to ensure a smooth project handoff?
+Job Description Based Mappings,How does your experience align with the core responsibilities of this role?
+Job Description Based Mappings,What specific technical skills do you bring that make you the best fit?
+Job Description Based Mappings,"Have you worked with [insert company tech stack] before? If not, how will you learn it?"
+Job Description Based Mappings,"What experience do you have with large-scale data pipelines, as mentioned in the JD?"
+Job Description Based Mappings,Can you explain a past project where you worked with similar datasets?
+Job Description Based Mappings,How would you approach solving X problem listed in the JD?
+Job Description Based Mappings,"What experience do you have with data governance & compliance (GDPR, HIPAA, etc.)?"
+Job Description Based Mappings,Have you worked on customer behavior analytics before?
+Job Description Based Mappings,How comfortable are you with working independently?
+Job Description Based Mappings,The JD mentions collaboration with business teams. How have you done that before?
+Job Description Based Mappings,"How have you used visualization tools (Tableau, Power BI, Looker, etc.) effectively?"
+Job Description Based Mappings,What strategies do you use for troubleshooting performance issues?
+Job Description Based Mappings,Can you give an example of when you had to improve a dashboard’s performance?
+Job Description Based Mappings,How would you improve data-driven decision-making at our company?
+Job Description Based Mappings,"What do you think is the biggest challenge of this role, and how would you tackle it?"
+Job Description Based Mappings,Have you worked on forecasting or predictive analytics projects?
+Job Description Based Mappings,How do you handle confidential or sensitive data?
+Job Description Based Mappings,What KPIs or success metrics do you track in similar roles?
+Job Description Based Mappings,How would you automate a repetitive manual data process?
+Job Description Based Mappings,Why do you want to work for our company specifically?
+Problem-Solving & Critical Thinking,You notice a sudden drop in user engagement on a dashboard. How do you investigate?
+Problem-Solving & Critical Thinking,A SQL query is running too slow. What steps would you take to improve performance?
+Problem-Solving & Critical Thinking,A dataset has conflicting values. How do you resolve this inconsistency?
+Problem-Solving & Critical Thinking,You have two weeks to deliver a high-priority project. How do you plan your work?
+Problem-Solving & Critical Thinking,How do you handle a stakeholder who keeps changing project requirements?
+Problem-Solving & Critical Thinking,What do you do if a model performs well in training but poorly in production?
+Problem-Solving & Critical Thinking,A dashboard is not loading for executives on mobile. What do you check first?
+Problem-Solving & Critical Thinking,You have to quickly onboard a junior analyst. How do you guide them?
+Problem-Solving & Critical Thinking,How would you validate the accuracy of a dataset provided by a third party?
+Problem-Solving & Critical Thinking,Your team has a disagreement on the best data model to use. How do you decide?
+Problem-Solving & Critical Thinking,"If given a new dataset, what first steps do you take to explore it?"
+Problem-Solving & Critical Thinking,How would you detect fraud in a financial dataset?
+Problem-Solving & Critical Thinking,Describe a time you had to debug a data integration issue.
+Problem-Solving & Critical Thinking,What would you do if an important client report had incorrect data?
+Problem-Solving & Critical Thinking,How do you ensure your solutions are scalable?
+Problem-Solving & Critical Thinking,How do you prioritize tasks when everything seems urgent?
+Problem-Solving & Critical Thinking,What strategies do you use for continuous learning?
+Problem-Solving & Critical Thinking,How do you challenge assumptions in a data-driven project?
+Problem-Solving & Critical Thinking,What’s the most creative solution you have come up with?
+Problem-Solving & Critical Thinking,How would you handle an unexpected system outage?
