@@ -248,7 +248,7 @@ function Dashboard() {
   const [data, setData] = useState(null);
   const [streakHistory, setStreakHistory] = useState([]);
   const [loading, setLoading] = useState(true); // Manage loading state
-  console.log("🚀 Dashboard component mounted!");
+  // console.log("🚀 Dashboard component mounted!");
   // Function to fetch the latest entry
   const fetchLatestEntry = async () => {
     try {
@@ -259,7 +259,7 @@ function Dashboard() {
 
       const streakResponse = await axios.get('https://server-backend-j3bt.onrender.com/api/streak-history');
       // const streakResponse = await axios.get('http://localhost:5000/api/streak-history');
-      console.log("Fetched streak history:", streakResponse.data);
+      // console.log("Fetched streak history:", streakResponse.data);
       setStreakHistory(streakResponse.data);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -289,10 +289,10 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    console.log("useEffect triggered - Fetching latest entry...");
+    // console.log("useEffect triggered - Fetching latest entry...");
     fetchLatestEntry();
   }, []);
-  console.log("Current state: ", { data, streakHistory, loading });
+  // console.log("Current state: ", { data, streakHistory, loading });
   if (loading) return <p>Loading...</p>;
   if (!data || Object.keys(data).length === 0) return <p>No data available.</p>;
 

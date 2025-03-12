@@ -12,14 +12,14 @@ const fetchGitHubData = async () => {
     const startOfDay = moment().tz('America/New_York').startOf('day');
     const endOfDay = moment().tz('America/New_York').endOf('day');
 
-    console.log(`Start of Day (EST): ${startOfDay.format()}`);
-    console.log(`End of Day (EST): ${endOfDay.format()}`);
+    // console.log(`Start of Day (EST): ${startOfDay.format()}`);
+    // console.log(`End of Day (EST): ${endOfDay.format()}`);
 
     // Filter events for commits made within the local day
     const commitsToday = response.data.filter((event) => {
       if (event.type !== 'PushEvent') return false;
       const eventDate = moment(event.created_at).tz('America/New_York');
-      console.log(`Event Date (EST): ${eventDate.format()}, Start: ${startOfDay.format()}, End: ${endOfDay.format()}`);
+      // console.log(`Event Date (EST): ${eventDate.format()}, Start: ${startOfDay.format()}, End: ${endOfDay.format()}`);
       return eventDate.isBetween(startOfDay, endOfDay, null, '[]');
     });
 
@@ -30,7 +30,7 @@ const fetchGitHubData = async () => {
       totalCommitstoday: commitsToday.length,
     };
   } catch (error) {
-    console.error('Error fetching GitHub data:', error);
+    // console.error('Error fetching GitHub data:', error);
     return { commits: 0, totalCommitstoday: 0 };
   }
 };

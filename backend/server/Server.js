@@ -212,7 +212,7 @@ app.post('/api/update-streak', async (req, res) => {
     const targetDate = moment.tz(date, 'America/New_York').startOf('day').utc().toISOString();
     const { startOfDay, endOfDay } = getUTCBoundariesForLocalDay();
 
-    console.log(`[DEBUG] Manually updating streak for ${date} (UTC: ${targetDate})`);
+    // console.log(`[DEBUG] Manually updating streak for ${date} (UTC: ${targetDate})`);
 
     // Fetch external data for the given date
     const [
@@ -282,11 +282,11 @@ app.get('/api/streak-history', async (req, res) => {
     console.log('[DEBUG] /api/streak-history: Request received.');
 
     const streakHistory = await Streak.find().sort({ date: 1 });
-    console.log('[DEBUG] Streak History Fetched:', streakHistory);
+    // console.log('[DEBUG] Streak History Fetched:', streakHistory);
 
     res.json(streakHistory);
   } catch (error) {
-    console.error('[ERROR] Error fetching streak history:', error);
+    // console.error('[ERROR] Error fetching streak history:', error);
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });

@@ -7,8 +7,8 @@ const fetchGeeksforGeeksData = async () => {
     const localChromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; // Path to local Chrome binary
 
     try {
-        console.log("Using local Chrome binary for testing...");
-        console.log("Launching browser with executable path:", localChromePath);
+        // console.log("Using local Chrome binary for testing...");
+        // console.log("Launching browser with executable path:", localChromePath);
 
         const browser = await puppeteer.launch({
             args: [

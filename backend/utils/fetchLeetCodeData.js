@@ -16,7 +16,7 @@ const fetchLeetCodeData = async () => {
 
   try {
     const response = await axios.post('https://leetcode.com/graphql', { query });
-    console.log('Response Data:', response.data); // Log response for debugging
+    // console.log('Response Data:', response.data); // Log response for debugging
 
     const stats = response.data.data.matchedUser.submitStats.acSubmissionNum;
 
@@ -34,7 +34,7 @@ const fetchLeetCodeData = async () => {
       totalProblemsSolved,
     };
   } catch (error) {
-    console.error('Error fetching LeetCode data:', error.response?.data || error.message);
+    // console.error('Error fetching LeetCode data:', error.response?.data || error.message);
     return { easy: 0, medium: 0, hard: 0, totalProblemsSolved: 0 };
   }
 };
