@@ -74,6 +74,8 @@ csv_file_exp = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQMgTJZHoKjf1Rb6
 data_skills = pd.read_excel(csv_file_exp, sheet_name='Sheet3')
 data_experience = pd.read_excel(csv_file_exp, sheet_name='Sheet2')
 data_certifications = pd.read_excel(csv_file_exp, sheet_name='Sheet4')
+data_projects = pd.read_excel(csv_file_exp, sheet_name='Sheet1')
+print("Data Projects",data_projects)
 print("Data Skills",data_skills)
 print("Data Experience",data_experience)
 print("Data Certifications",data_certifications)
@@ -82,7 +84,7 @@ data_experience['start_date'] = pd.to_datetime(data_experience['start_date'], er
 data_experience['end_date'] = pd.to_datetime(data_experience['end_date'], errors='coerce')
 data_certifications['issue_date'] = pd.to_datetime(data_certifications['issue_date'], errors='coerce')
 data_certifications['expiration_date'] = pd.to_datetime(data_certifications['expiration_date'], errors='coerce')
-
+print("Projects Columns",data_projects.columns)
 # Database connection URL
 database_url = "postgresql://postgres:postgres@localhost:5432/portfolio_db"
 engine = create_engine(database_url)
@@ -94,7 +96,7 @@ metadata.reflect(bind=engine)
 skills_table = metadata.tables['skills']
 experience_table = metadata.tables['experience']
 certifications_table = metadata.tables['certifications']
-
+project_table = metadata.tables['projects']
 def upsert_data(table, df, primary_keys):
     with engine.connect() as conn:
         transaction = conn.begin()  # Start transaction
@@ -118,6 +120,7 @@ def upsert_data(table, df, primary_keys):
 upsert_data(skills_table, data_skills, ['id'])
 upsert_data(experience_table, data_experience, ['id'])
 upsert_data(certifications_table, data_certifications, ['id'])
+upsert_data(project_table, data_projects, ['id'])
 
 
 

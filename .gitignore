@@ -62,3 +62,6 @@ __pycache__/
 *.py[cod]
 .Python
 *.sqlite3
+
+# Environment variables
+Scripts/.env
