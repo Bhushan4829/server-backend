@@ -86,7 +86,7 @@ data_certifications['issue_date'] = pd.to_datetime(data_certifications['issue_da
 data_certifications['expiration_date'] = pd.to_datetime(data_certifications['expiration_date'], errors='coerce')
 print("Projects Columns",data_projects.columns)
 # Database connection URL
-database_url = "postgresql://postgres:postgres@localhost:5432/portfolio_db"
+database_url = "postgresql://postgres:flowexample@localhost:5432/portfolio_db"
 engine = create_engine(database_url)
 
 # Reflect the existing tables from the database
