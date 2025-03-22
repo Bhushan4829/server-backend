@@ -5,6 +5,7 @@ from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 from openai import OpenAI
 import time
+import pandas as pd
 
 # Load environment variables
 load_dotenv()
@@ -20,19 +21,19 @@ client = OpenAI(api_key=openai.api_key)
 pc = Pinecone(api_key=pinecone_api)
 
 # ✅ Delete and Recreate Pinecone Index to Avoid Discrepancies
-if pinecone_index in [idx.name for idx in pc.list_indexes()]:
-    print(f"⚠️ Deleting existing index '{pinecone_index}' to prevent conflicts...")
-    pc.delete_index(pinecone_index)
-    time.sleep(2)  # Allow Pinecone to process deletion
+# if pinecone_index in [idx.name for idx in pc.list_indexes()]:
+#     print(f"⚠️ Deleting existing index '{pinecone_index}' to prevent conflicts...")
+#     pc.delete_index(pinecone_index)
+#     time.sleep(2)  # Allow Pinecone to process deletion
 
-print(f"🛠️ Creating a fresh index '{pinecone_index}'...")
-pc.create_index(
-    name=pinecone_index,
-    dimension=3072,  # Match embedding model
-    metric="cosine",
-    spec=ServerlessSpec(cloud="aws", region="us-east-1")
-)
-time.sleep(5)  # Ensure index is ready
+# print(f"🛠️ Creating a fresh index '{pinecone_index}'...")
+# pc.create_index(
+#     name=pinecone_index,
+#     dimension=3072,  # Match embedding model
+#     metric="cosine",
+#     spec=ServerlessSpec(cloud="aws", region="us-east-1")
+# )
+# time.sleep(5)  # Ensure index is ready
 
 # Get the Pinecone index
 index = pc.Index(pinecone_index)
@@ -128,6 +129,37 @@ def sync_all_data():
 
     print("\n✅ All categories synced successfully!")
 
+def upsert_interview_qa(csv_path):
+    df = pd.read_csv(csv_path)
+    vectors = []
+    
+    for idx, row in df.iterrows():
+        question = str(row['Question']).strip()
+        answer = str(row['Answer']).strip()
+        category = "interview_qa"  # 🔁 Common category for all
+        
+        if not question or not answer or answer.lower() == "nan":
+            continue
+        
+        combined_text = f"Q: {question}\nA: {answer}"
+        embedding = client.embeddings.create(input=[combined_text], model="text-embedding-3-large").data[0].embedding
+        
+        record_id = f"qa_{idx}"
+        metadata = {
+            "category": category,
+            "data_text": combined_text
+        }
+        vectors.append({"id": record_id, "values": embedding, "metadata": metadata})
+
+    if vectors:
+        print(f"🔄 Upserting {len(vectors)} interview QAs to Pinecone...")
+        index.upsert(vectors)
+        print("✅ Interview QAs upserted.")
+    else:
+        print("⚠️ No valid QA pairs found.")
+
+# Run once:
+# upsert_interview_qa("interview_questions_cleaned.csv")
 
 def verify_pinecone_data():
     """
@@ -160,12 +192,12 @@ def verify_pinecone_data():
 
 
 if __name__ == "__main__":
-    print("🔄 Syncing missing data to Pinecone...")
-    sync_all_data()
+    # print("🔄 Syncing missing data to Pinecone...")
+    # sync_all_data()
 
-    print("\n✅ Verification Step: Checking if data is stored correctly...")
-    verify_pinecone_data()
-
+    # print("\n✅ Verification Step: Checking if data is stored correctly...")
+    # verify_pinecone_data()
+    upsert_interview_qa("interview_questions_cleaned.csv")
 #During the development of my Emotional Intelligence Integration with Pepper Robot project, I encountered a significant challenge that required a change in approach. The project aimed to create an emotionally intelligent chatbot for caregiver support, integrating advanced language models with the Pepper robot for a multimodal communication experience. Initially, I used a 4-ensemble model comprising Llama, Falcon, and two instances of Phi2, but hosting the model on free CPU-based services like Google Colab resulted in slower response times. Additionally, integrating the chatbot with the Pepper robot was technically challenging due to the robot's SDK limitations, which only supported Python 2.7.
 
 #To address these challenges, I employed creative solutions, including using subprocesses to execute modern Python code, exploring alternative hosting options to improve response times, and refining the chatbot's architecture to optimize the ensemble model and integration with the Pepper robot. By adapting my approach, I successfully integrated the emotionally intelligent chatbot with the Pepper robot, achieving a 30% reduction in response time and a 25% improvement in overall system efficiency. This experience taught me the importance of agility in project development, creative problem-solving, and continuous evaluation and optimization. The project's outcome demonstrated the feasibility of using AI to enhance emotional interactions in caregiving contexts and set a foundation for future research into the broader application of AI in emotional support roles.
