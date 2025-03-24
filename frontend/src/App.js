@@ -7,6 +7,7 @@ import Experience from './components/Experience';
 import Dashboard from './components/Dashboards'; // Updated import path
 import NavigationBar from './components/NavigationBar';
 import ConnectWithMe from './components/Contact';
+import Chatbot from './components/Chatbot';
 import './App.css';
 
 function App() {
@@ -34,6 +35,13 @@ function App() {
           Home
         </button>
         <Dashboard />
+      </div>
+    );
+  } else if (currentPath === '/chatbot') {
+    content = (
+      <div className="p-4">
+        <button onClick={() => navigate('/')} className="home-button">Home</button>
+        <Chatbot />
       </div>
     );
   } else {

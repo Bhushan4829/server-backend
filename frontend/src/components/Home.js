@@ -50,6 +50,7 @@ function Home({ navigate }) {
               View Resume
             </button>
             <button onClick={() => navigate('/dashboard')}>Track My Consistency</button>
+            <button onClick={() => navigate('/chatbot')} className="nav-button">Chatbot Assistant</button>
           </div>
         </div>
 
