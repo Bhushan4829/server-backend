@@ -26,36 +26,39 @@ function Chatbot() {
 
   return (
     <div className="chatbot-page main-section">
-      <div className="job-description-block">
-        <h2>Job Description</h2>
-        <textarea
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          placeholder="Paste the job description here..."
-        />
-      </div>
+  <div className="chatbot-container">
+    <div className="job-description-block">
+      <h2>Job Description</h2>
+      <textarea
+        value={jobDescription}
+        onChange={(e) => setJobDescription(e.target.value)}
+        placeholder="Paste the job description here..."
+      />
+    </div>
 
-      <div className="chat-interface-block">
-        <h2>Chat Assistant</h2>
-        <div className="chat-window">
-          {messages.map((msg, i) => (
-            <div key={i} className={`chat-message ${msg.type}`}>
-              {msg.text}
-            </div>
-          ))}
-        </div>
-        <div className="chat-input">
-          <input
-            type="text"
-            placeholder="Ask something..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          />
-          <button onClick={handleSend}>Send</button>
-        </div>
+    <div className="chat-interface-block">
+      <h2>Chat Assistant</h2>
+      <div className="chat-window">
+        {messages.map((msg, i) => (
+          <div key={i} className={`chat-message ${msg.type}`}>
+            {msg.text}
+          </div>
+        ))}
+      </div>
+      <div className="chat-input">
+        <input
+          type="text"
+          placeholder="Ask something..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+        />
+        <button onClick={handleSend}>Send</button>
       </div>
     </div>
+  </div>
+</div>
+
   );
 }
 
