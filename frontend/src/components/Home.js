@@ -25,25 +25,21 @@ function Home({ navigate }) {
       <div className="home-container">
         {/* Left Section: About Me */}
         <div className="content">
-          <h1>
-            Hi, I am <span>Bhushan Mahajan</span>
-          </h1>
+        <h1>
+          <span className="hi-part">Hi, I am </span>
+          <span className="name-part">Bhushan Mahajan</span>
+        </h1>
+
           <p>
-            I'm a passionate Machine Learning Engineer who specializes in creating scalable and high-performance applications. 
-            Currently pursuing my Master's in Computer Science at the University at Buffalo, I thrive on solving challenging 
-            problems and delivering impactful solutions that make a difference.
+          A builder at heart who loves turning data into intelligent systems. Currently wrapping up my Master’s in Computer Science at the University at Buffalo, I specialize in crafting scalable, AI-powered solutions that bridge research and real-world impact.
           </p>
           <p>
-            I’m constantly exploring ways to leverage tools like LangChain, Docker, and Azure to bridge the gap 
-            between complex technical solutions and seamless user experiences.With expertise spanning AI, 
-            Data Engineering, and Cloud Technologies (Azure and AWS), I’ve worked on projects involving 
-            advanced machine learning workflows, scalable data pipelines, and AI-driven solutions that 
-            empower businesses to make informed decisions.
+          From designing ML workflows and deploying models with Docker & Azure, to building data pipelines that power decision-making — I’ve been deep in the code and the cloud. Tools like LangChain, AWS, and GPT models are my playground.
           </p>
           <p>
-            🔍 I am actively seeking full-time opportunities as a Machine Learning Engineer, AI Engineer, 
-            or Data Engineer, where I can apply my skills and creativity to solve real-world problems.
-            Let’s connect and create something amazing together! 🚀
+          🚀 I'm now seeking full-time roles as a Machine Learning Engineer, AI Engineer, or Data Engineer — where I can keep solving complex problems and build things that matter.
+
+            🌟 Let's create something meaningful together.
           </p>
           <div className="buttons">
             <button onClick={() => window.open('https://drive.google.com/file/d/1sd3TM-EARBDBdJ4d39Cj0yywthMqAV0b/view?usp=sharing', '_blank')}>

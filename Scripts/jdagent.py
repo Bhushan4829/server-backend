@@ -97,30 +97,32 @@ class JobAwareAgent:
         return self.grok_completion(prompt)
 
 # Example usage:
-if __name__ == "__main__":
-    agent = JobAwareAgent("interview_questions_cleaned.csv")
-    jd = """At Scale, our mission is to accelerate the development of AI applications. For 8 years, Scale has been the leading AI data foundry, helping fuel the most exciting advancements in AI, including: generative AI, defense applications, and autonomous vehicles. With our recent Series F round, we’re accelerating the abundance of frontier data to pave the road to Artificial General Intelligence (AGI), and building upon our prior model evaluation work with enterprise customers and governments, to deepen our capabilities and offerings for both public and private evaluations.
-    Example Projects:
-    Ship tools to accelerate the growth of new qualified contributors on Scale’s labeling platform
-    Build methodical fraud-detection systems to remove bad actors and keep Scale’s contributor base safe and trusted. 
-    Use models to estimate the quality of tasks and labelers, and guarantee quality on requests at large scale.
-    Devise advanced matching algorithms to match labelers to customers for optimal turnaround and accuracy.
-    Build methods to automatically measure, train, and optimally match labelers to tasks based on performance
-    Create optimized and efficient UI/UX tooling, in combination with ML algorithms, for 100k+ labelers to complete billions of complex tasks
-    Develop new AI infrastructure products to visualize, query, and explore Scale data
+# if __name__ == "__main__":
+#     agent = JobAwareAgent("interview_questions_cleaned.csv")
+#     jd = """At Scale, our mission is to accelerate the development of AI applications. For 8 years, Scale has been the leading AI data foundry, helping fuel the most exciting advancements in AI, including: generative AI, defense applications, and autonomous vehicles. With our recent Series F round, we’re accelerating the abundance of frontier data to pave the road to Artificial General Intelligence (AGI), and building upon our prior model evaluation work with enterprise customers and governments, to deepen our capabilities and offerings for both public and private evaluations.
+#     Example Projects:
+#     Ship tools to accelerate the growth of new qualified contributors on Scale’s labeling platform
+#     Build methodical fraud-detection systems to remove bad actors and keep Scale’s contributor base safe and trusted. 
+#     Use models to estimate the quality of tasks and labelers, and guarantee quality on requests at large scale.
+#     Devise advanced matching algorithms to match labelers to customers for optimal turnaround and accuracy.
+#     Build methods to automatically measure, train, and optimally match labelers to tasks based on performance
+#     Create optimized and efficient UI/UX tooling, in combination with ML algorithms, for 100k+ labelers to complete billions of complex tasks
+#     Develop new AI infrastructure products to visualize, query, and explore Scale data
     
-    Requirements:
-    A graduation date in Fall 2024 or Spring 2025 with a Bachelor’s degree (or equivalent) in a relevant field (Computer Science, EECS, Computer Engineering, Statistics) 
-    Product engineering experience such as building web apps full-stack, integrating with relevant APIs and services, talking to customers, figuring out ‘what’ to build and then iterating
-    Previous Computer Science/Software Engineering Internship experience 
-    Track record of shipping high-quality products and features at scale
-    Experience building systems that process large volumes of data
-    Experience with Python, React, typescript and/or MongoDB
-    Compensation packages at Scale for eligible roles include base salary, equity, and benefits. The range displayed on each job posting reflects the minimum and maximum target for new hire salaries for the position, determined by work location and additional factors, including job-related skills, experience, interview performance, and relevant education or training. Scale employees in eligible roles are also granted equity based compensation, subject to Board of Director approval. Your recruiter can share more about the specific salary range for your preferred location during the hiring process, and confirm whether the hired role will be eligible for equity grant. You’ll also receive benefits including, but not limited to: Comprehensive health, dental and vision coverage, retirement benefits, a learning and development stipend, and generous PTO. Additionally, this role may be eligible for additional benefits such as a commuter stipend.
+#     Requirements:
+#     A graduation date in Fall 2024 or Spring 2025 with a Bachelor’s degree (or equivalent) in a relevant field (Computer Science, EECS, Computer Engineering, Statistics) 
+#     Product engineering experience such as building web apps full-stack, integrating with relevant APIs and services, talking to customers, figuring out ‘what’ to build and then iterating
+#     Previous Computer Science/Software Engineering Internship experience 
+#     Track record of shipping high-quality products and features at scale
+#     Experience building systems that process large volumes of data
+#     Experience with Python, React, typescript and/or MongoDB
+#     Compensation packages at Scale for eligible roles include base salary, equity, and benefits. The range displayed on each job posting reflects the minimum and maximum target for new hire salaries for the position, determined by work location and additional factors, including job-related skills, experience, interview performance, and relevant education or training. Scale employees in eligible roles are also granted equity based compensation, subject to Board of Director approval. Your recruiter can share more about the specific salary range for your preferred location during the hiring process, and confirm whether the hired role will be eligible for equity grant. You’ll also receive benefits including, but not limited to: Comprehensive health, dental and vision coverage, retirement benefits, a learning and development stipend, and generous PTO. Additionally, this role may be eligible for additional benefits such as a commuter stipend.
 
-    Please reference the job posting's subtitle for where this position will be located. For pay transparency purposes, the base salary range for this full-time position in the locations of San Francisco, New York, Seattle is:
-    $124,000—$145,000 USD"""
-    response = agent.generate_response(jd, "What is your experience with AI?")
-    # print(agent.generate_response(jd, "Tell me about yourself"))
-    print("\n🤖 Response:")
-    print(response)
+#     Please reference the job posting's subtitle for where this position will be located. For pay transparency purposes, the base salary range for this full-time position in the locations of San Francisco, New York, Seattle is:
+#     $124,000—$145,000 USD"""
+#     response = agent.generate_response(jd, "What is your experience with AI?")
+#     # print(agent.generate_response(jd, "Tell me about yourself"))
+#     print("\n🤖 Response:")
+#     print(response)
+
+#Exposing API to be accessed.

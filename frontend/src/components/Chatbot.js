@@ -9,20 +9,35 @@ function Chatbot() {
   const [input, setInput] = useState('');
   const [jobDescription, setJobDescription] = useState('');
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === '') return;
-
-    setMessages((prev) => [...prev, { type: 'user', text: input }]);
+  
+    const userMessage = { type: 'user', text: input };
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
-
-    // Simulated bot response — replace with API later
-    setTimeout(() => {
+  
+    try {
+      const response = await fetch('https://job-aware-api.onrender.com/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: input,
+          job_description: jobDescription,
+        }),
+      });
+  
+      const data = await response.json();
+      const botMessage = { type: 'bot', text: data.response };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (err) {
+      console.error('Error:', err);
       setMessages((prev) => [
         ...prev,
-        { type: 'bot', text: `I got your question: "${input}"\nAnalyzing based on JD...` },
+        { type: 'bot', text: '⚠️ Error connecting to server.' },
       ]);
-    }, 800);
+    }
   };
+  
 
   return (
     <div className="chatbot-page main-section">

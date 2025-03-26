@@ -32,11 +32,18 @@
     font-size: calc(2rem + 1vw); /* Responsive title size */
     margin-bottom: 20px;
     color: #4caf50;
+    white-space: nowrap; /* Prevent line breaks */
   }
-  
-  .content h1 span {
+  .hi-part {
+  color: #4caf50;
+}
+
+.name-part {
+  color: #f2c94c;
+}
+  /* .content h1 span {
     color: #f2c94c; /* Highlight the name */
-  }
+  /* } */ 
   
   .content p {
     font-size: calc(1rem + 0.3vw);
@@ -85,6 +92,7 @@
       margin-left: 0; /* Remove margin for small screens */
       max-width: 100%; /* Full width on smaller screens */
       padding: 30px 15px;
+      white-space:normal;
     }
   
     .home-container {
