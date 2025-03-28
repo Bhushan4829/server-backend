@@ -2,8 +2,8 @@ name: Daily Backend Update
 
 on:
   schedule:
-    - cron: '0 4 * * *' # Runs at 4:00 AM UTC (which is 11:00 PM EST)
-  workflow_dispatch: # Allows manual trigger
+    - cron: '0 4 * * *' # Runs at 4:00 AM UTC (11:00 PM EST)
+  workflow_dispatch:
 
 jobs:
   update_backend:
