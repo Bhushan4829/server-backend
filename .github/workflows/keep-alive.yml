@@ -12,8 +12,7 @@ jobs:
       ENDPOINTS: |
         https://server-backend-j3bt.onrender.com/api/dashboard-data
         https://server-backend-j3bt.onrender.com/auth/google
-        https://server-backend-j3bt.onrender.com/
-        https://server-backend-j3bt.onrender.com/api/chatbot
+        https://job-aware-api.onrender.com/api/chat
 
     steps:
       - name: Ping all endpoints
@@ -24,7 +23,7 @@ jobs:
             echo "Pinging $url"
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
             echo "$url => $STATUS"
-            if [[ "$STATUS" -ne 200 ]]; then
+            if [[ "$STATUS" -ne 200 && "$STATUS" -ne 302 ]]; then
               FAILURES+="$url returned $STATUS\n"
             fi
           done <<< "${ENDPOINTS}"
@@ -46,10 +45,8 @@ jobs:
           password: ${{ secrets.GMAIL_PASS }}
           subject: "⚠️ Keep-Alive Ping Failure Detected"
           body: |
-            One or more backend endpoints failed to respond with 200 OK.
-
+            One or more backend endpoints failed to respond with 200/302 OK.
             ${{ steps.ping.outputs.failure_log }}
-
             Timestamp: ${{ github.event.schedule }}
           to: "bhushanmahajan2908@gmail.com"
           from: "Keep-Alive Bot <bhushanmahajan2908@gmail.com>"
