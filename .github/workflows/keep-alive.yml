@@ -1,0 +1,65 @@
+name: Keep Alive Ping
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # Change this for different frequency
+  workflow_dispatch:
+
+jobs:
+  keep_alive:
+    runs-on: ubuntu-latest
+    env:
+      ENDPOINTS: |
+        https://server-backend-j3bt.onrender.com/api/dashboard-data
+        https://server-backend-j3bt.onrender.com/auth/google
+        https://server-backend-j3bt.onrender.com/
+        https://server-backend-j3bt.onrender.com/api/chatbot
+
+    steps:
+      - name: Ping all endpoints
+        id: ping
+        run: |
+          FAILURES=""
+          while read -r url; do
+            echo "Pinging $url"
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+            echo "$url => $STATUS"
+            if [[ "$STATUS" -ne 200 ]]; then
+              FAILURES+="$url returned $STATUS\n"
+            fi
+          done <<< "${ENDPOINTS}"
+
+          if [ -n "$FAILURES" ]; then
+            echo "failures=true" >> "$GITHUB_OUTPUT"
+            echo "failure_log=$FAILURES" >> "$GITHUB_OUTPUT"
+          else
+            echo "failures=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Send email on failure
+        if: steps.ping.outputs.failures == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASS }}
+          subject: "⚠️ Keep-Alive Ping Failure Detected"
+          body: |
+            One or more backend endpoints failed to respond with 200 OK.
+
+            ${{ steps.ping.outputs.failure_log }}
+
+            Timestamp: ${{ github.event.schedule }}
+          to: "bhushanmahajan2908@gmail.com"
+          from: "Keep-Alive Bot <bhushanmahajan2908@gmail.com>"
+
+      # Optional: Slack alert
+      # - name: Slack Notify on failure
+      #   if: steps.ping.outputs.failures == 'true'
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: failure
+      #     fields: repo,message,commit,author
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
