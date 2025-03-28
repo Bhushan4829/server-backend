@@ -18,6 +18,7 @@ jobs:
           RETRIES=5
           DELAY=10
           while read -r url; do
+            [[ -z "$url" ]] && continue  # <-- This line skips blanks
             echo "🔄 Pinging $url (up to $RETRIES attempts)"
             for i in $(seq 1 $RETRIES); do
               STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
@@ -35,6 +36,7 @@ jobs:
               fi
             done
           done <<< "${ENDPOINTS}"
+      
           if [ -n "$FAILURES" ]; then
             echo "failures=true" >> "$GITHUB_OUTPUT"
             echo "failure_log=$FAILURES" >> "$GITHUB_OUTPUT"
