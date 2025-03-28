@@ -2,7 +2,7 @@ name: Keep Alive Ping
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Change this for different frequency
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,22 +10,35 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENDPOINTS: |
-        https://server-backend-j3bt.onrender.com/api/dashboard-data
+        # https://server-backend-j3bt.onrender.com/api/dashboard-data
         https://server-backend-j3bt.onrender.com/auth/google
-        https://job-aware-api.onrender.com/api/chat
+        https://job-aware-api.onrender.com/  # replace with actual route
 
     steps:
-      - name: Ping all endpoints
+      - name: Ping all endpoints with retry & delay
         id: ping
         run: |
           FAILURES=""
+          RETRIES=5
+          DELAY=10
+
           while read -r url; do
-            echo "Pinging $url"
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-            echo "$url => $STATUS"
-            if [[ "$STATUS" -ne 200 && "$STATUS" -ne 302 ]]; then
-              FAILURES+="$url returned $STATUS\n"
-            fi
+            echo "🔄 Pinging $url (up to $RETRIES attempts)"
+            for i in $(seq 1 $RETRIES); do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+              echo "Attempt $i: $url => $STATUS"
+              if [[ "$STATUS" -eq 200 || "$STATUS" -eq 302 ]]; then
+                echo "✅ Success on attempt $i"
+                break
+              fi
+              if [[ "$i" -lt $RETRIES ]]; then
+                echo "⏳ Waiting $DELAY seconds before retrying..."
+                sleep $DELAY
+              else
+                echo "❌ $url failed after $RETRIES retries"
+                FAILURES+="$url failed after $RETRIES retries with last status $STATUS\n"
+              fi
+            done
           done <<< "${ENDPOINTS}"
 
           if [ -n "$FAILURES" ]; then
@@ -45,11 +58,14 @@ jobs:
           password: ${{ secrets.GMAIL_PASS }}
           subject: "⚠️ Keep-Alive Ping Failure Detected"
           body: |
-            One or more backend endpoints failed to respond with 200/302 OK.
+            One or more backend endpoints failed to respond successfully after retries.
+
             ${{ steps.ping.outputs.failure_log }}
+
             Timestamp: ${{ github.event.schedule }}
           to: "bhushanmahajan2908@gmail.com"
           from: "Keep-Alive Bot <bhushanmahajan2908@gmail.com>"
+
 
       # Optional: Slack alert
       # - name: Slack Notify on failure
