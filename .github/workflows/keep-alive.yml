@@ -11,7 +11,7 @@ jobs:
     env:
       ENDPOINTS: |
         https://server-backend-j3bt.onrender.com/auth/google
-        https://job-aware-api.onrender.com/  # replace with actual route
+        https://job-aware-api.onrender.com/
 
     steps:
       - name: Ping all endpoints with retry & delay
