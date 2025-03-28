@@ -1,10 +1,8 @@
 name: Keep Alive Ping
-
 on:
   schedule:
     - cron: '*/30 * * * *'
   workflow_dispatch:
-
 jobs:
   keep_alive:
     runs-on: ubuntu-latest
@@ -12,7 +10,6 @@ jobs:
       ENDPOINTS: |
         https://server-backend-j3bt.onrender.com/auth/google
         https://job-aware-api.onrender.com/
-
     steps:
       - name: Ping all endpoints with retry & delay
         id: ping
@@ -20,7 +17,6 @@ jobs:
           FAILURES=""
           RETRIES=5
           DELAY=10
-
           while read -r url; do
             echo "🔄 Pinging $url (up to $RETRIES attempts)"
             for i in $(seq 1 $RETRIES); do
@@ -39,14 +35,12 @@ jobs:
               fi
             done
           done <<< "${ENDPOINTS}"
-
           if [ -n "$FAILURES" ]; then
             echo "failures=true" >> "$GITHUB_OUTPUT"
             echo "failure_log=$FAILURES" >> "$GITHUB_OUTPUT"
           else
             echo "failures=false" >> "$GITHUB_OUTPUT"
           fi
-
       - name: Send email on failure
         if: steps.ping.outputs.failures == 'true'
         uses: dawidd6/action-send-mail@v3
@@ -58,20 +52,7 @@ jobs:
           subject: "⚠️ Keep-Alive Ping Failure Detected"
           body: |
             One or more backend endpoints failed to respond successfully after retries.
-
             ${{ steps.ping.outputs.failure_log }}
-
             Timestamp: ${{ github.event.schedule }}
           to: "bhushanmahajan2908@gmail.com"
           from: "Keep-Alive Bot <bhushanmahajan2908@gmail.com>"
-
-
-      # Optional: Slack alert
-      # - name: Slack Notify on failure
-      #   if: steps.ping.outputs.failures == 'true'
-      #   uses: 8398a7/action-slack@v3
-      #   with:
-      #     status: failure
-      #     fields: repo,message,commit,author
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
