@@ -173,7 +173,46 @@
   margin-top: 20px;
   justify-content: center;
 }
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
 
+.arrow-button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.arrow-button:disabled {
+  background-color: #888;
+  cursor: not-allowed;
+}
+
+.arrow-button:hover:not(:disabled) {
+  background-color: #388e3c;
+}
+.animated-slide {
+  animation: slideFade 0.5s ease-in-out;
+}
+
+@keyframes slideFade {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 /* Responsive tweaks */
 @media (max-width: 992px) {
   .project-card {

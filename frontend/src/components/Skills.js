@@ -28,6 +28,22 @@ function Skills() {
     { name: 'Tableau', icon: '/assets/icons/tableau.png', category: 'Data Visualization' },
     { name: 'GCP', icon: '/assets/icons/GCP.png', category: 'Cloud Computing' },
     { name: 'Azure', icon: '/assets/icons/azure.png', category: 'Cloud Computing' },
+    { name: 'AWS', icon: '/assets/icons/aws.png', category: 'Cloud Computing' },
+    { name: 'Docker', icon: '/assets/icons/docker.png', category: 'Software' },
+    { name: 'Kubernetes', icon: '/assets/icons/kubernetes.png', category: 'Software' },
+    { name: 'Mongo DB', icon: '/assets/icons/mongodb.png', category: 'Database' },
+    { name: 'Cosmos DB', icon: '/assets/icons/cosmosdb.png', category: 'Database' },
+    { name: 'Pinecone', icon: '/assets/icons/pinecone.png', category: 'Database' },
+    { name: 'redis', icon: '/assets/icons/redis.jpg', category: 'Database' },
+    { name: 'keydb', icon: '/assets/icons/keydb.png', category: 'Database' },
+    { name: 'Langchain', icon: '/assets/icons/langchain.png', category: 'Artificial Intelligence' },
+    { name: 'oracle cloud', icon: '/assets/icons/oracle_cloud.png', category: 'Cloud Computing' },
+    { name: 'llama', icon: '/assets/icons/llama.jpg', category: 'Finetuned Models' },
+    { name: 'GPT-4o', icon: '/assets/icons/openai.png', category: 'Finetuned Models' },
+    { name: 'Bert', icon: '/assets/icons/bert.jpg', category: 'Finetuned Models' },
+    { name: 'mistral', icon: '/assets/icons/mistral.png', category: 'Finetuned Models' },
+    { name: 'falcon', icon: '/assets/icons/falcon.png', category: 'Finetuned Models' },
+    { name: 'huggingface', icon: '/assets/icons/huggingface.png', category: 'Finetuned Models' },
   ];
 
   const handleFilterChange = (category) => {
@@ -47,6 +63,7 @@ function Skills() {
         <button onClick={() => handleFilterChange('Web Development')}>Web Dev</button>
         <button onClick={() => handleFilterChange('Database')}>Database</button>
         <button onClick={() => handleFilterChange('Data Science')}>Data Science</button>
+        <button onClick={() => handleFilterChange('Finetuned Models')}>Finetuned Models</button>
       </div>
       <div className="skills-grid">
         {filteredSkills.map((skill, index) => (

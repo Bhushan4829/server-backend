@@ -5,7 +5,7 @@ import project2 from '../assests/projects/project2.png';
 import project3 from '../assests/projects/project3.png';
 
 function Projects() {
-  const [showMore, setShowMore] = useState(false);
+  // const [showMore, setShowMore] = useState(false);
 
   const projects = [
     {
@@ -37,50 +37,115 @@ function Projects() {
     },
   ];
 
-  const initialProjects = projects.slice(0, 2);
-  const extraProjects = projects.slice(2);
+//   const initialProjects = projects.slice(0, 2);
+//   const extraProjects = projects.slice(2);
+
+//   return (
+//     <section id="projects" className="projects-section main-section">
+//       <h2>Projects</h2>
+//       <div className="projects-list">
+//         {initialProjects.map((project, index) => (
+//           <ProjectCard key={index} project={project} />
+//         ))}
+//       </div>
+
+//       <button className="toggle-button" onClick={() => setShowMore(true)}>
+//         Show More
+//       </button>
+
+//       {showMore && (
+//         <div className="modal-overlay">
+//           <div className="modal-content">
+//             <div className="modal-header">
+//               <h3>More Projects</h3>
+//               <button className="close-modal" onClick={() => setShowMore(false)}>
+//                 &times;
+//               </button>
+//             </div>
+//             <div className="extra-projects-grid">
+//             {extraProjects.map((project, index) => (
+//               <ProjectCard key={index} project={project} isModal />
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </section>
+//   );
+// }
+
+// function ProjectCard({ project, isModal = false }) {
+//   return (
+//     <a
+//       href={project.link}
+//       target="_blank"
+//       rel="noopener noreferrer"
+//       className={isModal ? "modal-project-card" : "project-card"}
+//     >
+//       <img src={project.image} alt={project.title} className="project-image" />
+//       <div className="project-content">
+//         <h3>{project.title}</h3>
+//         <p>{project.description}</p>
+//         <div className="project-tags">
+//           {project.tags.map((tag, i) => (
+//             <span key={i} className="project-tag">{tag}</span>
+//           ))}
+//         </div>
+//       </div>
+//     </a>
+//   );
+// }
+
+
+// export default Projects;
+const itemsPerPage = 2;
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const startIndex = currentPage * itemsPerPage;
+  const currentProjects = projects.slice(startIndex, startIndex + itemsPerPage);
+
+  const canGoBack = currentPage > 0;
+  const canGoForward = startIndex + itemsPerPage < projects.length;
 
   return (
     <section id="projects" className="projects-section main-section">
       <h2>Projects</h2>
-      <div className="projects-list">
-        {initialProjects.map((project, index) => (
+      <div
+        className="projects-list animated-slide"
+        key={currentPage} // triggers re-render and animation
+      >
+        {currentProjects.map((project, index) => (
           <ProjectCard key={index} project={project} />
         ))}
       </div>
 
-      <button className="toggle-button" onClick={() => setShowMore(true)}>
-        Show More
-      </button>
-
-      {showMore && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>More Projects</h3>
-              <button className="close-modal" onClick={() => setShowMore(false)}>
-                &times;
-              </button>
-            </div>
-            <div className="extra-projects-grid">
-            {extraProjects.map((project, index) => (
-              <ProjectCard key={index} project={project} isModal />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="pagination-buttons">
+        <button
+          className="arrow-button"
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={!canGoBack}
+        >
+          &#8592; Previous
+        </button>
+        <button
+          className="arrow-button"
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={!canGoForward}
+        >
+          Next &#8594;
+        </button>
+      </div>
     </section>
   );
 }
 
-function ProjectCard({ project, isModal = false }) {
+function ProjectCard({ project }) {
   return (
     <a
       href={project.link}
       target="_blank"
       rel="noopener noreferrer"
-      className={isModal ? "modal-project-card" : "project-card"}
+      className="project-card"
     >
       <img src={project.image} alt={project.title} className="project-image" />
       <div className="project-content">
@@ -95,6 +160,5 @@ function ProjectCard({ project, isModal = false }) {
     </a>
   );
 }
-
 
 export default Projects;
