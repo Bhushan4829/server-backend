@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}  # Now using consistent name
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
       PINECONE_INDEX: ${{ secrets.PINECONE_INDEX }}
-      GSHEET_URL: ${{ secrets.GSHEET_URL }}  # For Excel extraction
+      GSHEET_URL: ${{ secrets.GSHEET_URL }}
 
     steps:
     - name: Checkout code
@@ -34,24 +34,16 @@ jobs:
         pip install psycopg2-binary pinecone-client openai python-dotenv pandas sqlalchemy gspread
 
     - name: Extract Excel to Postgres
-      run: python extracting_data_for_portfolio.py
-      env:
-        DATABASE_URL: ${{ env.DATABASE_URL }}  # Inherits from job env
-        GSHEET_URL: ${{ env.GSHEET_URL }}
+      run: python Scripts/extracting_data_for_portfolio.py  # Updated path
 
     - name: Sync Postgres to Pinecone
-      run: python sync_postgres_pinecone.py
-      env:
-        DATABASE_URL: ${{ env.DATABASE_URL }}
-        OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
-        PINECONE_API_KEY: ${{ env.PINECONE_API_KEY }}
-        PINECONE_INDEX: ${{ env.PINECONE_INDEX }}
+      run: python Scripts/sync_postgres_pinecone.py  # Updated path
 
     - name: Upload logs if failed
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sync-logs
         path: |
-          *.log
-          *.error
+          Scripts/*.log
+          Scripts/*.error
