@@ -168,14 +168,18 @@ from sqlalchemy import create_engine
 
 # New code:
 import pandas as pd
-from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy import create_engine, MetaData, Table, text
 from sqlalchemy.dialects.postgresql import insert
 import hashlib
 import os
 from datetime import datetime
+from sqlalchemy import Integer
+from dotenv import load_dotenv
+import numpy as np
+load_dotenv()
 
 # Configuration
-GSHEET_URL = os.getenv('GSHEET_URL', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQMgTJZHoKjf1Rb6eQ4hzY-sfOZHJb6qxQTMZnvT7SYQ8IasB8NeA7fKetDVgLg0gxYiuTbd-FjXl9R/pub?output=xlsx')
+GSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQMgTJZHoKjf1Rb6eQ4hzY-sfOZHJb6qxQTMZnvT7SYQ8IasB8NeA7fKetDVgLg0gxYiuTbd-FjXl9R/pub?output=xlsx"
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 def get_timestamp():
@@ -190,67 +194,117 @@ def compute_row_hash(row, exclude_keys=["id"]):
     return hashlib.md5("|".join(relevant_data).encode()).hexdigest()
 
 def prepare_dataframe(df, date_columns=[]):
-    """Clean and prepare DataFrame"""
+    """Clean DataFrame with proper NULL handling for dates"""
     # Convert date columns
     for col in date_columns:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col], errors='coerce')
     
-    # Replace NaN with None for SQL
-    return df.where(pd.notnull(df), None)
+    # Replace all NA-like values with None (SQL NULL)
+    df = df.replace([pd.NaT, pd.NA, np.nan], None)
+    
+    return df
 
 def upsert_data(engine, table, df, primary_keys):
-    """Efficient upsert with hash comparison"""
+    """Type-aware upsert with robust NULL handling and proper transaction management"""
     metadata = MetaData()
     metadata.reflect(bind=engine)
     table_obj = metadata.tables[table]
     
     stats = {'inserted': 0, 'updated': 0, 'skipped': 0}
     
-    with engine.connect() as conn:
+    # Use transaction with proper commit
+    with engine.begin() as conn:  # This automatically commits on success
         for _, row in df.iterrows():
-            row_dict = row.to_dict()
+            # Convert row to dict with proper NULL handling
+            row_dict = {
+                k: None if pd.isna(v) else v 
+                for k, v in row.to_dict().items()
+            }
+            
+            # Special handling for IDs
+            if 'id' in row_dict:
+                if isinstance(table_obj.c.id.type, Integer):
+                    try:
+                        row_dict['id'] = int(float(row_dict['id'])) if row_dict['id'] else None
+                    except (ValueError, TypeError):
+                        log_message(f"⚠️ Invalid ID for {table}: {row_dict['id']}")
+                        continue
+                else:
+                    row_dict['id'] = str(row_dict['id']) if row_dict['id'] else None
+            
+            # Skip if ID is invalid
+            if row_dict.get('id') is None:
+                log_message(f"⚠️ Skipping row with NULL ID in {table}")
+                continue
+                
             row_hash = compute_row_hash(row_dict)
             row_dict['content_hash'] = row_hash
             
-            # Check existing hash
+            # Check existing record
             existing = conn.execute(
-                table_obj.select().where(table_obj.c.id == row['id'])
+                table_obj.select().where(table_obj.c.id == row_dict['id'])
             ).fetchone()
             
             if existing and existing.content_hash == row_hash:
                 stats['skipped'] += 1
                 continue
-            
-            stmt = insert(table_obj).values(**row_dict)
-            stmt = stmt.on_conflict_do_update(
-                index_elements=primary_keys,
-                set_={k: v for k, v in row_dict.items() if k not in primary_keys}
-            )
-            conn.execute(stmt)
-            stats['updated' if existing else 'inserted'] += 1
+                
+            # Prepare upsert
+            try:
+                stmt = insert(table_obj).values(**row_dict)
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=primary_keys,
+                    set_={k: v for k, v in row_dict.items() if k not in primary_keys}
+                )
+                result = conn.execute(stmt)
+                stats['updated' if existing else 'inserted'] += 1
+                log_message(f"✅ Successfully upserted {table} ID {row_dict['id']}")
+            except Exception as e:
+                log_message(f"⚠️ Failed to upsert {table} ID {row_dict['id']}: {str(e)}")
+                continue
     
     return stats
+
+def verify_data_insertion(engine, table_name):
+    """Verify that data was actually inserted"""
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
+            count = result.fetchone()[0]
+            log_message(f"✅ Verified: {table_name} table has {count} rows")
+            return count
+    except Exception as e:
+        log_message(f"❌ Failed to verify {table_name}: {str(e)}")
+        return 0
 
 def main():
     log_message("Starting data extraction from Google Sheets")
     
     try:
-        # Load and prepare all datasets
+        # Test database connection first
+        log_message("Testing database connection...")
+        engine = create_engine(DATABASE_URL)
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT 1"))
+            log_message("✅ Database connection successful")
+        
+        # Load data with type hints
         log_message("Loading data from Google Sheets")
-        skills_df = pd.read_excel(GSHEET_URL, sheet_name='Sheet3')
+        skills_df = pd.read_excel(GSHEET_URL, sheet_name='Sheet3', dtype={'id': str})
         exp_df = pd.read_excel(GSHEET_URL, sheet_name='Sheet2')
         cert_df = pd.read_excel(GSHEET_URL, sheet_name='Sheet4')
         projects_df = pd.read_excel(GSHEET_URL, sheet_name='Sheet1')
         
-        # Prepare data
-        exp_df, _ = prepare_dataframe(exp_df, ['start_date', 'end_date'])
-        cert_df, _ = prepare_dataframe(cert_df, ['issue_date', 'expiration_date'])
+        log_message(f"Loaded data - Skills: {len(skills_df)}, Experience: {len(exp_df)}, Certifications: {len(cert_df)}, Projects: {len(projects_df)}")
         
-        # Database setup
-        engine = create_engine(DATABASE_URL)
+        # Prepare data with proper NULL handling
+        exp_df = prepare_dataframe(exp_df, ['start_date', 'end_date'])
+        cert_df = prepare_dataframe(cert_df, ['issue_date', 'expiration_date'])
+        projects_df = prepare_dataframe(projects_df)
+        skills_df = prepare_dataframe(skills_df)
         
-        # Process each table
+        # Process tables with type awareness
         tables = {
             'skills': (skills_df, ['id']),
             'experience': (exp_df, ['id']),
@@ -259,17 +313,24 @@ def main():
         }
         
         for table_name, (df, pks) in tables.items():
-            log_message(f"Processing {table_name} table")
+            log_message(f"Processing {table_name} table ({len(df)} rows)")
             stats = upsert_data(engine, table_name, df, pks)
             log_message(
-                f"{table_name} stats: "
-                f"{stats['inserted']} new, "
+                f"{table_name} results: "
+                f"{stats['inserted']} inserted, "
                 f"{stats['updated']} updated, "
                 f"{stats['skipped']} unchanged"
             )
             
+            # Verify insertion
+            verify_data_insertion(engine, table_name)
+            
+        log_message("✅ Data extraction completed successfully")
+            
     except Exception as e:
-        log_message(f"❌ Error: {str(e)}")
+        log_message(f"❌ Critical error: {str(e)}")
+        import traceback
+        log_message(f"Full traceback: {traceback.format_exc()}")
         raise
 
 if __name__ == "__main__":
