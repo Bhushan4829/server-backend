@@ -34,10 +34,10 @@ jobs:
         pip install psycopg2-binary pinecone-client openai python-dotenv pandas sqlalchemy gspread
 
     - name: Extract Excel to Postgres
-      run: python extracting_data_for_portfolio.py
+      run: python Scripts/extracting_data_for_portfolio.py  # Updated path
 
     - name: Sync Postgres to Pinecone
-      run: python sync_postgres_pinecone.py
+      run: python Scripts/sync_postgres_pinecone.py  # Updated path
 
     - name: Upload logs if failed
       if: failure()
@@ -45,5 +45,5 @@ jobs:
       with:
         name: sync-logs
         path: |
-          *.log
-          *.error
+          Scripts/*.log
+          Scripts/*.error
