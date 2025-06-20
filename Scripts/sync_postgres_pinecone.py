@@ -249,8 +249,8 @@ def get_existing_pinecone_hash(record_id):
     """Check if record exists in Pinecone and return its hash if found."""
     try:
         result = index.fetch(ids=[record_id])
-        if record_id in result['vectors']:
-            return result['vectors'][record_id]['metadata'].get('hash')
+        if record_id in result.vectors:
+            return result.vectors[record_id].metadata.get('hash')
     except Exception as e:
         print(f"⚠️ Error checking Pinecone for {record_id}: {e}")
     return None
@@ -311,15 +311,15 @@ def sync_category_data(table_name):
             try:
                 # Fetch existing record (if any)
                 fetch_result = index.fetch(ids=[record_id])
-                existing_record = fetch_result['vectors'].get(record_id)
+                existing_record = fetch_result.vectors.get(record_id)
+                
             except Exception as e:
                 print(f"⚠️ Error checking Pinecone for {record_id}: {e}")
 
             # Decision logic for processing
             should_process = True
             if existing_record:
-                existing_metadata = existing_record.get('metadata', {})
-                existing_hash = existing_metadata.get('hash')
+                existing_hash = existing_record.metadata.get('hash') if existing_record.metadata else None
                 
                 if existing_hash:
                     if existing_hash == current_hash:
@@ -433,4 +433,4 @@ if __name__ == "__main__":
     # Example usage:
     sync_all_data()
     # verify_pinecone_data()
-    upsert_interview_qa("interview_questions_cleaned.csv")
+    upsert_interview_qa("./Scripts/interview_questions_cleaned.csv")

@@ -65,3 +65,4 @@ __pycache__/
 
 # Environment variables
 Scripts/.env
+.env
