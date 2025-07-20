@@ -70,7 +70,18 @@ class JobAwareAgent:
             temperature=temperature,
         )
         return completion.choices[0].message.content.strip()
-
+    def chatgpt_completion(self, prompt, max_tokens=500,temperature=0.7):
+        messages = [
+            {"role": "system", "content": "You are a job-aware assistant."},
+            {"role": "user", "content": prompt}
+        ]
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
+        return response.choices[0].message.content.strip()
     def generate_response(self, user_question, jd_text=None):
         # Step 1: Infer relevant categories based on question (and JD if available)
         categories = self.infer_categories(user_question, jd_text)
@@ -95,6 +106,30 @@ class JobAwareAgent:
             f"Provide a JD-aware, category-relevant, professional response."
         )
         return self.grok_completion(prompt)
+    def generate_chatgpt_response(self, user_question, jd_text=None):
+        # Step 1: Infer relevant categories based on question (and JD if available)
+        categories = self.infer_categories(user_question, jd_text)
+
+        # Step 2: Use JD or fallback to question for vector search
+        embed_input = jd_text if jd_text else user_question
+        query_embedding = self.get_embedding(embed_input)
+
+        # Step 3: Retrieve from Pinecone using inferred categories
+        profile_contexts = self.query_pinecone(query_embedding, categories, top_k=7)
+        context_block = "\n".join(profile_contexts)
+
+        # Step 4: Pull personalized answer from interview QA if applicable
+        matched_answer = self.retrieve_qa(user_question)
+
+        # Step 5: Construct and send to OpenAI ChatCompletion
+        full_prompt = (
+            f"Job Description:\n{jd_text or 'N/A'}\n\n"
+            f"Candidate Context:\n{context_block}\n\n"
+            f"User Question:\n{user_question}\n\n"
+            f"Personalized Answer (if any): {matched_answer}\n\n"
+            "Please respond as a JD-aware, professional AI assistant."
+        )
+        return self.chatgpt_completion(full_prompt)
 
 # Example usage:
 # if __name__ == "__main__":

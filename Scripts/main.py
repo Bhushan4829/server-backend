@@ -3,10 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from jdagent import JobAwareAgent  # make sure this file holds your class
 import uvicorn
-
+from openai import OpenAI
+from pinecone import Pinecone
+import pandas as pd
+import os
+from dotenv import load_dotenv
+# Load environment variables
+load_dotenv()
 # Initialize FastAPI app
 app = FastAPI()
-
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # CORS config to allow React frontend
 app.add_middleware(
     CORSMiddleware,
@@ -37,7 +43,12 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-
+@app.post("/api/chatgpt")
+async def chatgpt(request: ChatRequest):
+    if not request.question.strip():
+        return {"response": "Please provide a question."}
+    response = agent.generate_chatgpt_response(user_question=request.question, jd_text=request.job_description)
+    return {"response": response}
 # Entry point
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=7999, reload=True)
