@@ -3,15 +3,23 @@ import './Projects.css';
 import project1 from '../assests/projects/project1.png';
 import project2 from '../assests/projects/project2.png';
 import project3 from '../assests/projects/project3.png';
-
+import project6 from '../assests/projects/project6.png';
+import project7 from '../assests/projects/project7.png';
 function Projects() {
   // const [showMore, setShowMore] = useState(false);
 
   const projects = [
     {
+      title: 'Linkedin Note Generator - Your AI powered sidekick for networking',
+      description: 'A smart Chrome extension that makes LinkedIn networking effortless by generating personalized connection notes, InMails, and cold emails in one click. Using profile data (name, headline, experience), our React + TypeScript frontend and FastAPI backend (with Supabase and OpenAI GPT models) create tailored, professional messages that feel genuine—no more copy-paste templates. With features like a messaging dashboard, customizable templates, and resume/job description integration, it acts as your personal networking assistant, saving time while making outreach thoughtful and effective.',
+      image: project6,
+      tags: ['React', 'TypeScript', 'FastAPI', 'OpenAI'],
+      link: 'https://github.com/Bhushan4829/linkedin-note-generator',
+    },
+    {
       title: 'AI powered Patient Portal',
       description: 'A full-stack health platform built with React and Flask that empowers patients with personalized insights and easy access to their medical data. The web app features a dynamic dashboard for visualizing key health metrics and an AI-powered chatbot with multi-agent architecture. One agent assists with symptom-based diagnosis using OpenAI and PubMed integration, asking follow-up questions for higher accuracy. Another agent (in progress) focuses on generating radiology reports. Patient data is managed using a graph database for contextual reasoning, with strong privacy measures like row-level security and planned federated learning to ensure compliance and data protection.',
-      image: project2,
+      image: project7,
       tags: ['React', 'OpenAI', 'Multi Agent', 'Privacy'],
       link: 'https://github.com/Bhushan4829/patient_portal',
     },
