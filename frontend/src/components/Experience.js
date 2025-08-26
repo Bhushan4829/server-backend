@@ -4,6 +4,33 @@ import './Experience.css';
 function Experience() {
   const experiences = [
     {
+      date: 'Jun 2025 - present',
+      title: 'AI Intern, Right Skale, Remote',
+      description: 
+        '• Built a Flask-based Excel data extraction microservice with dynamic LLM prompts, cutting S3 I/O by 80% and boosting retrieval speed by 60%.\n' +
+        '• Developed a Dockerized RAG pipeline (Qdrant + OpenAI embeddings + LlamaParse) deployed on AWS ECS with full unit/integration test coverage.\n' +
+        '• Automated deployments with a GitHub Actions CI/CD pipeline, including tests, rollbacks, and email notifications for production reliability.',
+      tags: ['Flask', 'Docker', 'AWS ECS', 'GitHub Actions', 'CI/CD', 'LLM', 'RAG', 'Qdrant', 'OpenAI', 'LlamaParse'],
+    },
+    {
+      date: 'Dec 2024 - May 2025',
+      title: 'AI Engineer Intern, Flow, Remote',
+      description:
+        '• Designed real-time ETL pipelines using Apache Kafka & Airflow, processing thousands of CRM records and improving analytics efficiency by 20%.\n' +
+        '• Containerized and deployed scalable API microservices on AWS ECS, integrating Pinecone for semantic search and CI/CD for fast delivery.\n' +
+        '• Partnered with cross-functional teams to integrate Gemini, Redis, and Prometheus for high-availability inference, logging, and monitoring.',
+      tags: ['Apache Kafka', 'Airflow', 'AWS ECS', 'CI/CD', 'Pinecone', 'Gemini', 'Redis', 'Prometheus'],
+    },
+    {
+      date: 'Aug 2024 - May 2025',
+      title: 'Research Assistant, University at Buffalo, Buffalo, NY',
+      description:
+        '• Built a HIPAA-compliant multi-agent conversational AI (LangGraph) integrating symptom extraction, disease prediction, and RLHF-based reasoning for healthcare applications.\n' +
+        '• Designed an LLM ensemble pipeline (MedAlpaca-7B, OpenAI, similarity re-ranking) to boost diagnostic accuracy with confidence scoring and adaptive follow-up.\n' +
+        '• Integrated PubMed + MIMIC-IV FHIR data via Databricks and Pinecone to deliver personalized, evidence-based clinical insights with memory and CoT prompting.',
+      tags: ['LangGraph', 'LLM', 'PubMed', 'MIMIC-IV', 'Databricks', 'Pinecone', 'HIPAA', 'CoT', 'RLHF'],
+    },
+    {
       date: 'Aug 2024 — Dec 2024',
       title: 'Graduate Teaching Assistant, University at Buffalo, Buffalo, NY',
       description:
