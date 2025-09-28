@@ -55,15 +55,55 @@ function Skills() {
   return (
     <section id="skills" className="skills-section">
       <h2>Tech Stack</h2>
-      <div>
-        <button onClick={() => handleFilterChange('All')}>All</button>
-        <button onClick={() => handleFilterChange('Artificial Intelligence')}>AI</button>
-        <button onClick={() => handleFilterChange('Cloud Computing')}>Cloud</button>
-        <button onClick={() => handleFilterChange('Software')}>Software</button>
-        <button onClick={() => handleFilterChange('Web Development')}>Web Dev</button>
-        <button onClick={() => handleFilterChange('Database')}>Database</button>
-        <button onClick={() => handleFilterChange('Data Science')}>Data Science</button>
-        <button onClick={() => handleFilterChange('Finetuned Models')}>Finetuned Models</button>
+      <div className="filter-buttons">
+        <button 
+          className={filter === 'All' ? 'active' : ''}
+          onClick={() => handleFilterChange('All')}
+        >
+          All
+        </button>
+        <button 
+          className={filter === 'Artificial Intelligence' ? 'active' : ''}
+          onClick={() => handleFilterChange('Artificial Intelligence')}
+        >
+          AI
+        </button>
+        <button 
+          className={filter === 'Cloud Computing' ? 'active' : ''}
+          onClick={() => handleFilterChange('Cloud Computing')}
+        >
+          Cloud
+        </button>
+        <button 
+          className={filter === 'Software' ? 'active' : ''}
+          onClick={() => handleFilterChange('Software')}
+        >
+          Software
+        </button>
+        <button 
+          className={filter === 'Web Development' ? 'active' : ''}
+          onClick={() => handleFilterChange('Web Development')}
+        >
+          Web Dev
+        </button>
+        <button 
+          className={filter === 'Database' ? 'active' : ''}
+          onClick={() => handleFilterChange('Database')}
+        >
+          Database
+        </button>
+        <button 
+          className={filter === 'Data Science' ? 'active' : ''}
+          onClick={() => handleFilterChange('Data Science')}
+        >
+          Data Science
+        </button>
+        <button 
+          className={filter === 'Finetuned Models' ? 'active' : ''}
+          onClick={() => handleFilterChange('Finetuned Models')}
+        >
+          Finetuned Models
+        </button>
       </div>
       <div className="skills-grid">
         {filteredSkills.map((skill, index) => (

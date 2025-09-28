@@ -4,6 +4,9 @@ import './NavigationBar.css';
 function NavigationBar() {
   return (
     <div className="navigation-bar">
+      <div className="name-button">
+        Bhushan Mahajan
+      </div>
       <ul>
         <li><a href="#home">Home</a></li>
         <li><a href="#education">Education</a></li>

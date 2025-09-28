@@ -46,9 +46,9 @@ function App() {
     );
   } else {
     content = (
-      <>
+      <div className="main-layout">
         <NavigationBar />
-        <div className="ml-[300px]">
+        <div className="main-content">
           <Home navigate={navigate} />
           <Education />
           <Skills />
@@ -56,7 +56,7 @@ function App() {
           <Experience />
           <ConnectWithMe />
         </div>
-      </>
+      </div>
     );
   }
 
@@ -67,6 +67,20 @@ function App() {
       }`}
     >
       <main>{content}</main>
+      
+      {/* Floating Chatbot Button */}
+      {currentPath !== '/chatbot' && (
+        <div className="floating-chatbot">
+          <button
+            onClick={() => navigate('/chatbot')}
+            className="chatbot-fab"
+            title="Open AI Assistant"
+          >
+            <span className="chatbot-icon">🤖</span>
+            <span className="chatbot-pulse"></span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
