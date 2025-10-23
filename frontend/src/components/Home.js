@@ -31,13 +31,13 @@ function Home({ navigate }) {
         </h1>
 
           <p>
-          A builder at heart who loves turning data into intelligent systems. Currently wrapping up my Master’s in Computer Science at the University at Buffalo, I specialize in crafting scalable, AI-powered solutions that bridge research and real-world impact.
+          A builder at heart who loves turning data into intelligent systems. Currently interning at Right Skale as AI Engineer, Wrapped up my Master’s in Computer Science at the University at Buffalo, I specialize in crafting scalable, AI-powered solutions that bridge research and real-world impact.
           </p>
           <p>
-          From designing ML workflows and deploying models with Docker & Azure, to building data pipelines that power decision-making — I’ve been deep in the code and the cloud. Tools like LangChain, AWS, and GPT models are my playground.
+          From designing ML workflows and deploying models with Docker & AWS, to building data pipelines that power decision-making - I’ve been deep in the code and the cloud. Tools like LangChain, AWS, and GPT models are my playground.
           </p>
           <p>
-          🚀 I'm now seeking full-time roles as a Machine Learning Engineer, AI Engineer, or Data Engineer — where I can keep solving complex problems and build things that matter.
+          🚀 I'm now seeking full-time roles as a Machine Learning Engineer, AI Engineer, or Software Engineer - where I can keep solving complex AI problems and build things that matter.
 
             🌟 Let's create something meaningful together.
           </p>
@@ -46,7 +46,6 @@ function Home({ navigate }) {
               View Resume
             </button>
             <button onClick={() => navigate('/dashboard')}>Track My Consistency</button>
-            <button onClick={() => navigate('/chatbot')} className="nav-button">Chatbot Assistant</button>
           </div>
         </div>
 
