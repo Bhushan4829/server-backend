@@ -383,7 +383,7 @@ If you encounter any issues or have questions:
 
 <div align="center">
 
-**Made with ❤️ by [Your Name]**
+**Made By Bhushan**
 
 [![GitHub stars](https://img.shields.io/github/stars/yourusername/server-backend?style=social)](https://github.com/yourusername/server-backend)
 [![GitHub forks](https://img.shields.io/github/forks/yourusername/server-backend?style=social)](https://github.com/yourusername/server-backend)
