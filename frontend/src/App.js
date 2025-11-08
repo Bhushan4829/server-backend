@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboards'; // Updated import path
 import NavigationBar from './components/NavigationBar';
 import ConnectWithMe from './components/Contact';
 import Chatbot from './components/Chatbot';
+import NeuralNetworkBackground from './components/NeuralNetworkBackground';
 import './App.css';
 
 function App() {
@@ -66,7 +67,10 @@ function App() {
         currentPath === '/dashboard' ? 'bg-dashboard' : 'bg-gray-900'
       }`}
     >
-      <main>{content}</main>
+      {/* INSANE 3D Neural Network Background */}
+      <NeuralNetworkBackground />
+      
+      <main className="relative z-10">{content}</main>
       
       {/* Floating Chatbot Button */}
       {currentPath !== '/chatbot' && (

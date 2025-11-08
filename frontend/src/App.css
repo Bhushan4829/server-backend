@@ -12,10 +12,11 @@
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Modern Gradient Backgrounds */
+/* Modern Gradient Backgrounds - Now Semi-Transparent for 3D Effect */
 .bg-dashboard {
-  background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
+  background: linear-gradient(135deg, rgba(15, 20, 25, 0.3) 0%, rgba(26, 31, 46, 0.4) 50%, rgba(15, 20, 25, 0.3) 100%);
   position: relative;
+  backdrop-filter: blur(1px);
 }
 
 .bg-dashboard::before {
@@ -25,15 +26,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.05) 0%, transparent 50%);
   pointer-events: none;
 }
 
 .bg-gray-900 {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.2) 0%, rgba(26, 26, 26, 0.3) 50%, rgba(15, 15, 15, 0.2) 100%);
   position: relative;
+  backdrop-filter: blur(1px);
 }
 
 .bg-gray-900::before {
@@ -43,8 +45,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 25% 25%, rgba(76, 175, 80, 0.05) 0%, transparent 50%),
-              radial-gradient(circle at 75% 75%, rgba(242, 201, 76, 0.05) 0%, transparent 50%);
+  background: radial-gradient(circle at 25% 25%, rgba(76, 175, 80, 0.02) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(242, 201, 76, 0.02) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -142,6 +144,31 @@
     transform: scale(1.4);
     opacity: 0;
   }
+}
+
+/* 3D Neural Network Content Enhancement */
+.main-content {
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(2px);
+  border-radius: 0;
+}
+
+/* Enhanced content sections for better readability */
+section {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(3px);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  border-radius: 12px;
+  margin: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+}
+
+/* Navigation bar enhancement */
+.navigation-bar {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  border-right: 1px solid rgba(0, 255, 255, 0.2);
 }
 
 /* Responsive adjustments for floating button */
