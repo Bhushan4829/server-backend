@@ -225,6 +225,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 pinecone_api = os.getenv("PINECONE_API_KEY")
 pinecone_index = os.getenv("PINECONE_INDEX")
 database_url = os.getenv("DATABASE_URL")
+embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
 
 # Initialize clients
 client = OpenAI(api_key=openai.api_key)
@@ -234,7 +235,7 @@ index = pc.Index(pinecone_index)
 def get_embedding(text):
     """Compute an embedding using OpenAI's embedding API."""
     try:
-        response = client.embeddings.create(input=[text], model="text-embedding-3-large")
+        response = client.embeddings.create(input=[text], model=embedding_model)
         return response.data[0].embedding
     except Exception as e:
         print(f"❌ Error computing embedding: {e}")
@@ -408,7 +409,7 @@ def upsert_interview_qa(csv_path):
         
         embedding = client.embeddings.create(
             input=[combined_text], 
-            model="text-embedding-3-large"
+            model=embedding_model
         ).data[0].embedding
         
         metadata = {

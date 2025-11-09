@@ -1,8 +1,10 @@
 import os
+import json
 import pandas as pd
 from dotenv import load_dotenv
 from openai import OpenAI
 from pinecone import Pinecone
+from difflib import get_close_matches
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +19,10 @@ openai_client = OpenAI(api_key=openai_key)
 groq_client = OpenAI(api_key=groq_key, base_url="https://api.groq.com/openai/v1")
 pinecone_client = Pinecone(api_key=pinecone_key)
 index = pinecone_client.Index(pinecone_index)
+EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+
+DEFAULT_CATEGORIES = ["interview_qa", "skills", "projects", "experience", "certifications"]
+MAX_CONTEXT = 5
 
 
 class JobAwareAgent:
@@ -24,37 +30,114 @@ class JobAwareAgent:
         self.qa_df = pd.read_csv(qa_csv_path)
 
     def get_embedding(self, text):
-        response = openai_client.embeddings.create(input=text, model="text-embedding-3-large")
+        response = openai_client.embeddings.create(input=text, model=EMBEDDING_MODEL)
         return response.data[0].embedding
 
-    def infer_categories(self, question, jd_text=None):
+    def plan_retrieval(self, question, jd_text=None):
         system_prompt = (
-            "You are an AI assistant that maps a question (and optional job description) to relevant categories. "
-            "Choose from: interview_qa, skills, projects, experience, certifications. Return a comma-separated list."
+            "You are a retrieval planner for an interview assistant.\n"
+            "Given a candidate question and optional job description, decide:\n"
+            "1. Which knowledge-base categories to search (choose from: interview_qa, skills, projects, experience, certifications).\n"
+            "2. Which keywords or themes to emphasise during retrieval.\n"
+            "3. Whether we are missing critical info and should ask the user to provide more context before answering.\n"
+            "Respond as a JSON object like: {\"categories\": [...], \"keywords\": \"text\", \"needs_additional_context\": false, \"reasoning\": \"...\"}."
         )
-        user_input = f"Question: {question}\n\nJob Description: {jd_text or 'None'}"
+        user_input = {
+            "question": question,
+            "job_description": jd_text or ""
+        }
         messages = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_input}
+            {"role": "user", "content": json.dumps(user_input, ensure_ascii=False)}
         ]
-        completion = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=messages,
-            max_tokens=50,
-        )
-        categories = completion.choices[0].message.content.strip()
-        return [cat.strip().lower() for cat in categories.replace("\n", ",").split(",") if cat.strip()]
+        try:
+            completion = groq_client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=messages,
+                max_tokens=200,
+                temperature=0.2,
+            )
+            content = completion.choices[0].message.content.strip()
+            plan = json.loads(content)
+        except Exception as exc:  # Fallback if parsing fails
+            plan = {
+                "categories": DEFAULT_CATEGORIES,
+                "keywords": question,
+                "needs_additional_context": False,
+                "reasoning": f"Fallback plan due to error: {exc}"
+            }
+        categories = plan.get("categories") or DEFAULT_CATEGORIES
+        plan["categories"] = [cat.strip().lower() for cat in categories if cat]
+        plan.setdefault("keywords", question)
+        plan.setdefault("needs_additional_context", False)
+        plan.setdefault("reasoning", "")
+        return plan
 
     def query_pinecone(self, embedding, categories, top_k=5):
-        result = index.query(
-            vector=embedding,
-            top_k=top_k,
-            include_metadata=True,
-            filter={"category": {"$in": categories}}
-        )
-        return [match["metadata"]["data_text"] for match in result.get("matches", [])]
+        try:
+            result = index.query(
+                vector=embedding,
+                top_k=top_k,
+                include_metadata=True,
+                filter={"category": {"$in": categories}},
+            )
+        except Exception:
+            return []
 
-    def retrieve_qa(self, question):
+        matches = []
+        for match in result.get("matches", []):
+            metadata = match.get("metadata", {})
+            matches.append({
+                "id": match.get("id"),
+                "score": match.get("score", 0.0),
+                "category": metadata.get("category", "unknown"),
+                "data_text": metadata.get("data_text", ""),
+                "hash": metadata.get("hash"),
+            })
+        return matches
+
+    def blended_retrieval(self, user_question, jd_text, categories):
+        queries = [
+            user_question,
+            "\n".join(filter(None, [jd_text, user_question]))
+        ]
+        all_matches = {}
+        for query_text in queries:
+            if not query_text:
+                continue
+            embedding = self.get_embedding(query_text)
+            results = self.query_pinecone(embedding, categories, top_k=MAX_CONTEXT)
+            for res in results:
+                match_id = res.get("id")
+                if not match_id:
+                    continue
+                existing = all_matches.get(match_id)
+                if not existing or res["score"] > existing["score"]:
+                    all_matches[match_id] = res
+        matches = sorted(all_matches.values(), key=lambda r: r.get("score", 0.0), reverse=True)
+        if len(matches) < 3 and set(categories) != set(DEFAULT_CATEGORIES):
+            broadened = self.query_pinecone(
+                self.get_embedding(user_question or (jd_text or "")),
+                DEFAULT_CATEGORIES,
+                top_k=MAX_CONTEXT
+            )
+            for res in broadened:
+                match_id = res.get("id")
+                if not match_id:
+                    continue
+                existing = all_matches.get(match_id)
+                if not existing or res["score"] > existing["score"]:
+                    all_matches[match_id] = res
+            matches = sorted(all_matches.values(), key=lambda r: r.get("score", 0.0), reverse=True)
+        return matches[:MAX_CONTEXT]
+
+    def retrieve_qa(self, question, keywords=None):
+        if keywords:
+            candidates = get_close_matches(question, self.qa_df["Question"].tolist(), n=1, cutoff=0.3)
+            if candidates:
+                match = self.qa_df[self.qa_df["Question"] == candidates[0]]
+                if not match.empty:
+                    return match["Answer"].values[0]
         matched = self.qa_df[self.qa_df["Question"].str.lower().str.contains(question.lower())]
         return matched["Answer"].values[0] if not matched.empty else ""
 
@@ -70,9 +153,13 @@ class JobAwareAgent:
             temperature=temperature,
         )
         return completion.choices[0].message.content.strip()
-    def chatgpt_completion(self, prompt, max_tokens=500,temperature=0.7):
+
+    def chatgpt_completion(self, prompt, max_tokens=500, temperature=0.7):
         messages = [
-            {"role": "system", "content": "You are a job-aware assistant."},
+            {"role": "system", "content": (
+                "You are Bhushan Mahajan's AI representative. Respond in first person as Bhushan,"
+                " stay professional, JD-aware, and ground every statement in the supplied evidence."
+            )},
             {"role": "user", "content": prompt}
         ]
         response = openai_client.chat.completions.create(
@@ -82,54 +169,58 @@ class JobAwareAgent:
             temperature=temperature,
         )
         return response.choices[0].message.content.strip()
+
     def generate_response(self, user_question, jd_text=None):
-        # Step 1: Infer relevant categories based on question (and JD if available)
-        categories = self.infer_categories(user_question, jd_text)
-
-        # Step 2: Use JD or fallback to question for vector search
-        embed_input = jd_text if jd_text else user_question
-        query_embedding = self.get_embedding(embed_input)
-
-        # Step 3: Retrieve from Pinecone using inferred categories
-        profile_contexts = self.query_pinecone(query_embedding, categories, top_k=7)
-        context_block = "\n".join(profile_contexts)
-
-        # Step 4: Pull personalized answer from interview QA if applicable
+        plan = self.plan_retrieval(user_question, jd_text)
+        categories = plan.get("categories", DEFAULT_CATEGORIES)
+        embed_space_input = "\n".join(filter(None, [jd_text, user_question, plan.get("keywords")]))
+        query_embedding = self.get_embedding(embed_space_input)
+        profile_contexts = self.blended_retrieval(user_question, jd_text, categories)
+        context_block = "\n".join(
+            f"- ({ctx['category']} | score {ctx['score']:.3f}) {ctx['data_text']}"
+            for ctx in profile_contexts
+            if ctx.get("data_text")
+        )
         matched_answer = self.retrieve_qa(user_question)
-
-        # Step 5: Construct and send to Groq LLM
         prompt = (
             f"Job Description (optional):\n{jd_text or 'N/A'}\n\n"
-            f"Candidate Profile Context:\n{context_block}\n\n"
+            f"Retrieval Plan Reasoning: {plan.get('reasoning', '')}\n"
+            f"Needs Additional Context: {plan.get('needs_additional_context')}\n"
+            f"Candidate Profile Context:\n{context_block or 'None found'}\n\n"
             f"User Question: {user_question}\n\n"
-            f"Personalized Answer (if any): {matched_answer}\n\n"
+            f"Personalized Answer (if any): {matched_answer or 'N/A'}\n\n"
             f"Provide a JD-aware, category-relevant, professional response."
         )
         return self.grok_completion(prompt)
+
     def generate_chatgpt_response(self, user_question, jd_text=None):
-        # Step 1: Infer relevant categories based on question (and JD if available)
-        categories = self.infer_categories(user_question, jd_text)
+        plan = self.plan_retrieval(user_question, jd_text)
+        categories = plan.get("categories", DEFAULT_CATEGORIES)
+        embed_space_input = "\n".join(filter(None, [jd_text, user_question, plan.get("keywords")]))
+        query_embedding = self.get_embedding(embed_space_input)
+        profile_contexts = self.blended_retrieval(user_question, jd_text, categories)
+        matched_answer = self.retrieve_qa(user_question, plan.get("keywords"))
 
-        # Step 2: Use JD or fallback to question for vector search
-        embed_input = jd_text if jd_text else user_question
-        query_embedding = self.get_embedding(embed_input)
-
-        # Step 3: Retrieve from Pinecone using inferred categories
-        profile_contexts = self.query_pinecone(query_embedding, categories, top_k=7)
-        context_block = "\n".join(profile_contexts)
-
-        # Step 4: Pull personalized answer from interview QA if applicable
-        matched_answer = self.retrieve_qa(user_question)
-
-        # Step 5: Construct and send to OpenAI ChatCompletion
-        full_prompt = (
-            f"Job Description:\n{jd_text or 'N/A'}\n\n"
-            f"Candidate Context:\n{context_block}\n\n"
-            f"User Question:\n{user_question}\n\n"
-            f"Personalized Answer (if any): {matched_answer}\n\n"
-            "Please respond as a JD-aware, professional AI assistant."
+        context_summary = "\n".join(
+            f"{idx+1}. ({ctx['category']}, score {ctx['score']:.3f}) {ctx['data_text']}"
+            for idx, ctx in enumerate(profile_contexts)
+            if ctx.get("data_text")
         )
-        return self.chatgpt_completion(full_prompt)
+
+        instructions = (
+            "Role: You are Bhushan Mahajan answering directly in first person for interview-style questions.\n"
+            f"Planner focus: categories={', '.join(categories)} | keywords={plan.get('keywords', '')} | needs_more={plan.get('needs_additional_context')}\n"
+            f"Evidence:\n{context_summary or 'No matching evidence retrieved.'}\n"
+            f"Interview QA:\n{matched_answer or 'No direct QA match.'}\n"
+            "Guidelines:\n- Lead with a direct answer grounded in evidence.\n"
+            "- Mention relevant projects/skills if they appear above.\n"
+            "- If evidence is missing, ask for the missing detail before concluding.\n"
+            "- Stay under 160 words, professional tone, first-person.\n"
+            "- Finish with `Confidence: High/Medium/Low` based on evidence strength.\n"
+            f"Question: {user_question}\n"
+            f"Job Description: {jd_text or 'Not provided.'}"
+        )
+        return self.chatgpt_completion(instructions)
 
 # Example usage:
 # if __name__ == "__main__":

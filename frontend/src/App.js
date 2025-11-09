@@ -71,6 +71,10 @@ function App() {
       {/* Floating Chatbot Button */}
       {currentPath !== '/chatbot' && (
         <div className="floating-chatbot">
+          <div className="chatbot-popover">
+            Want to know more?
+            <span>I’m Bhushan’s personal assistant. Let’s chat!</span>
+          </div>
           <button
             onClick={() => navigate('/chatbot')}
             className="chatbot-fab"

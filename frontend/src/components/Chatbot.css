@@ -119,13 +119,18 @@
   padding-top: 10px;
 }
 
-.chat-input input {
+.chat-input textarea {
   flex: 1;
   padding: 10px 15px;
   border-radius: 8px;
   border: 1px solid #333;
   background-color: #0f1419;
   color: white;
+  resize: vertical;
+  min-height: 48px;
+  max-height: 150px;
+  overflow-y: auto;
+  font-family: inherit;
 }
 
 .chat-input button {

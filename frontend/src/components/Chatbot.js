@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Chatbot.css';
 
+const API_BASE_URL = (process.env.REACT_APP_CHAT_API_BASE_URL || 'http://localhost:7999').replace(/\/$/, '');
+const CHAT_ENDPOINT = `${API_BASE_URL}/api/chatgpt`;
+
 function Chatbot() {
   const [messages, setMessages] = useState([]); // Removed initial sample messages
   const [input, setInput] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [showJobDesc, setShowJobDesc] = useState(false);
   const [showSamples, setShowSamples] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -20,9 +24,10 @@ function Chatbot() {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setShowSamples(false);
+    setIsLoading(true);
   
     try {
-      const response = await fetch('https://job-aware-api.onrender.com/api/chat', {
+      const response = await fetch(CHAT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -30,7 +35,11 @@ function Chatbot() {
           job_description: jobDescription,
         }),
       });
-  
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
       const data = await response.json();
       const botMessage = { type: 'bot', text: data.response };
       setMessages((prev) => [...prev, botMessage]);
@@ -40,6 +49,8 @@ function Chatbot() {
         ...prev,
         { type: 'bot', text: '⚠️ Error connecting to server.' },
       ]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -105,19 +116,32 @@ function Chatbot() {
                 ))}
               </div>
             )}
-            
+
+            {isLoading && (
+              <div className="chat-message bot loading">
+                Thinking...
+              </div>
+            )}
+
             <div ref={chatEndRef} />
           </div>
           <div className="chat-input">
-            <input
-              type="text"
+            <textarea
               placeholder="Ask something..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
               onFocus={() => setShowSamples(false)}
+              disabled={isLoading}
             />
-            <button onClick={handleSend}>Send</button>
+            <button onClick={handleSend} disabled={isLoading || !input.trim()}>
+              {isLoading ? 'Waiting...' : 'Send'}
+            </button>
           </div>
         </div>
       </div>

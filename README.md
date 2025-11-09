@@ -216,6 +216,11 @@ OPENAI_API_KEY=your_openai_api_key
 PINECONE_API_KEY=your_pinecone_api_key
 ```
 
+### Frontend (.env)
+```env
+REACT_APP_CHAT_API_BASE_URL=http://localhost:7999
+```
+
 ## 🏃‍♂️ Running the Application
 
 ### Development Mode
@@ -315,10 +320,16 @@ GITHUB_TOKEN=your_github_token
 ```env
 # OpenAI
 OPENAI_API_KEY=sk-your-openai-key
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 
 # Pinecone
 PINECONE_API_KEY=your-pinecone-key
 PINECONE_ENVIRONMENT=your-environment
+```
+
+### Frontend (.env)
+```env
+REACT_APP_CHAT_API_BASE_URL=http://localhost:7999
 ```
 
 ## 🐳 Docker Support
